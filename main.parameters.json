@@ -12,7 +12,7 @@
             "value": "sfc01-wu3-dev-vnet__"
         },
         "vnetResourceGroupName": {
-            "value": "sfc01-wu3-dev-vnet__"
+            "value": "sfc-network-dev-rg__"
         }
     }
 }
