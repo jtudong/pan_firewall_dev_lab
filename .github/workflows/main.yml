@@ -27,5 +27,5 @@ jobs:
           scope: subscription
           subscriptionID: ${{ env.subscription_id}}
           region: ${{ env.location}}
-          template: env.location
+          template: ./main.json
           deploymentName: resource_group
