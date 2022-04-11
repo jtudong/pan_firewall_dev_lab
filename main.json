@@ -12,6 +12,14 @@
             "location": "westus3",
             "dependsOn": [],
             "tags": {}
+        },
+        {
+            "name": "sfc-firewall-dev-rg__",
+            "type": "Microsoft.Resources/resourceGroups",
+            "apiVersion": "2022-01-01",
+            "location": "westus3",
+            "dependsOn": [],
+            "tags": {}
         }
     ],
     "outputs": {}
