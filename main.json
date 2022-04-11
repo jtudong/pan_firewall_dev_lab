@@ -1,15 +1,52 @@
 {
     "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
-    "parameters": {},
+    "parameters": {
+        "location": {
+            "type": "string",
+            "metadata": {
+                "description":  "The region for the VNet"
+            }
+        },
+        "environment": {
+            "type": "string",
+            "metadata": {
+                "description": "The name of the environment"
+            },
+            "allowedValues": [
+                "prod",
+                "dev",
+                "sandbox"
+            ]
+        },
+        "virtualNetworkName": {
+            "type": "string",
+            "metadata": {
+                "description": "The name of the VNET"
+            }
+        },
+        "vnetResourceGroupName": {
+            "type": "string",
+            "metadata": {
+                "description": "The name of the VNET resource group"
+            }
+        }
+    },
     "functions": [],
-    "variables": {},
+    "variables": {
+        "tags": {
+            "Department": "it",
+            "Team": "networking",
+            "Environment": "[parameters('environment')]",
+            "Application": "network"
+        }
+    },
     "resources": [
         {
-            "name": "sfc01-wu3-dev-vnet__",
+            "name": "[parameters('vnetResourceGroupName')]",
             "type": "Microsoft.Resources/resourceGroups",
             "apiVersion": "2022-01-01",
-            "location": "westus3",
+            "location": "[parameters('location')]",
             "dependsOn": [],
             "tags": {}
         },
@@ -17,9 +54,61 @@
             "name": "sfc-firewall-dev-rg__",
             "type": "Microsoft.Resources/resourceGroups",
             "apiVersion": "2022-01-01",
-            "location": "westus3",
+            "location": "[parameters('location')]",
             "dependsOn": [],
             "tags": {}
+        },
+        {
+            "name": "vnetDeployment",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2021-04-01",
+            "resourceGroup": "[parameters('vnetResourceGroupName')]",
+            "dependsOn": ["[resourceId('Microsoft.Resources/resourceGroups', parameters('vnetResourceGroupName'))]"],
+            "properties": {
+                "mode": "Incremental",
+                "template": {
+                    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+                    "contentVersion": "1.0.0.0",
+                    "variables": {},
+                    "resources": [
+                        {
+                            "name": "[parameters('virtualNetworkName')]",
+                            "type": "Microsoft.Network/virtualNetworks",
+                            "apiVersion": "2020-11-01",
+                            "location": "[parameters('location')]",
+                            "tags": "[variables('tags')]",
+                            "properties": {
+                                "addressSpace": {
+                                    "addressPrefixes": [
+                                        "10.16.0.0/16"
+                                    ]
+                                },
+                                "subnets": [
+                                    {
+                                        "name": "firewall-management",
+                                        "properties": {
+                                            "addressPrefix": "10.16.4.0/24"
+                                        }
+                                    },
+                                    {
+                                        "name": "firewall-untrusted",
+                                        "properties": {
+                                            "addressPrefix": "10.16.2.0/24"
+                                        }
+                                    },
+                                    {
+                                        "name": "firewall-trusted",
+                                        "properties": {
+                                            "addressPrefix": "10.16.3.0/24"
+                                        }
+                                     }
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": {}
+                }
+            }
         }
     ],
     "outputs": {}

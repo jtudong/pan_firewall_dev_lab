@@ -21,11 +21,13 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIAL_VS_SANDBOX }}
 
-      - name: Deploy network resource Group
+      - name: Deploy main template
         uses: Azure/arm-deploy@v1
         with:
           scope: subscription
           subscriptionID: ${{ env.subscription_id}}
           region: ${{ env.location}}
           template: ./main.json
-          deploymentName: resource_group
+          parameters: ./main.parameters.json
+          deploymentName: main
+          
