@@ -1,0 +1,126 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "location": {
+            "type": "string",
+            "metadata": {
+                "description": "The region for the VNet"
+            }
+        },
+        "environment": {
+            "type": "string",
+            "metadata": {
+                "description": "The name of the environment"
+            },
+            "allowedValues": [
+                "prod",
+                "dev",
+                "sandbox"
+            ]
+        }
+    },
+    "functions": [],
+    "variables": {
+        "tags": {
+            "Department": "it",
+            "Team": "networking",
+            "Environment": "[parameters('environment')]",
+            "Application": "network"
+        }
+    },
+    "resources": [
+        {
+            "name": "nsgManagementDeployment",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2021-04-01",
+            "condition": true,
+            "resourceGroup": "sfc-firewall-dev-rg__",
+            "properties": {
+                "mode": "Incremental",
+                "template": {
+                    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+                    "contentVersion": "1.0.0.0",
+                    "variables": {},
+                    "resources": [
+                        {
+                            "name": "firewall-management-dev-nsg",
+                            "type": "Microsoft.Network/networkSecurityGroups",
+                            "apiVersion": "2020-11-01",
+                            "location": "[parameters('location')]",
+                            "tags": "[variables('tags')]",
+                            "properties": {
+                                "securityRules": [
+                                    {
+                                        "name": "AllowAzFoodsInBound",
+                                        "properties": {
+                                            "description": "AllowAzFoodsInBound",
+                                            "protocol": "*",
+                                            "sourcePortRange": "*",
+                                            "destinationPortRange": "*",
+                                            "destinationAddressPrefix": "*",
+                                            "access": "Allow",
+                                            "priority": 1000,
+                                            "direction": "Inbound",
+                                            "sourcePortRanges": [],
+                                            "destinationPortRanges": [],
+                                            "sourceAddressPrefixes": [
+                                                "172.16.252.0/22",
+                                                "10.123.23.57/32"
+                                            ],
+                                            "destinationAddressPrefixes": []
+                                        }
+                                    },
+                                    {
+                                        "name": "AllowDCsInBound",
+                                        "properties": {
+                                            "description": "AllowDCsInBound",
+                                            "protocol": "*",
+                                            "sourcePortRange": "*",
+                                            "destinationPortRange": "*",
+                                            "destinationAddressPrefix": "*",
+                                            "access": "Allow",
+                                            "priority": 1100,
+                                            "direction": "Inbound",
+                                            "sourcePortRanges": [],
+                                            "destinationPortRanges": [],
+                                            "sourceAddressPrefixes": [
+                                                "172.17.2.44/32",
+                                                "172.17.1.159/32"
+                                            ],
+                                            "destinationAddressPrefixes": []
+                                        }
+                                    },
+                                    {
+                                        "name": "GlobalProtect",
+                                        "properties": {
+                                            "description": "GlobalProtect",
+                                            "protocol": "*",
+                                            "sourcePortRange": "*",
+                                            "destinationPortRange": "*",
+                                            "destinationAddressPrefix": "*",
+                                            "access": "Allow",
+                                            "priority": 1200,
+                                            "direction": "Inbound",
+                                            "sourcePortRanges": [],
+                                            "destinationPortRanges": [],
+                                            "sourceAddressPrefixes": [
+                                                "10.10.20.0/22",
+                                                "10.10.24.0/24",
+                                                "10.10.200.0/21",
+                                                "10.10.210.0/23"
+                                            ],
+                                            "destinationAddressPrefixes": []
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": {}
+                }
+            }
+        }
+    ],
+    "outputs": {}
+}

@@ -51,7 +51,7 @@
         {
             "name": "[parameters('vnetResourceGroupName')]",
             "type": "Microsoft.Resources/resourceGroups",
-            "apiVersion": "2021-05-01",
+            "apiVersion": "2021-04-01",
             "location": "[parameters('location')]",
             "dependsOn": [],
             "tags": {}
@@ -59,7 +59,7 @@
         {
             "name": "[parameters('firewallResourceGroupName')]",
             "type": "Microsoft.Resources/resourceGroups",
-            "apiVersion": "2021-05-01",
+            "apiVersion": "2021-04-01",
             "location": "[parameters('location')]",
             "dependsOn": [],
             "tags": {}
@@ -68,6 +68,7 @@
             "name": "vnetDeployment",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2021-04-01",
+            "condition": true,
             "resourceGroup": "[parameters('vnetResourceGroupName')]",
             "dependsOn": ["[resourceId('Microsoft.Resources/resourceGroups', parameters('vnetResourceGroupName'))]"],
             "properties": {
@@ -107,7 +108,7 @@
                                         "properties": {
                                             "addressPrefix": "10.16.3.0/24"
                                         }
-                                     }
+                                    }
                                 ]
                             }
                         }
