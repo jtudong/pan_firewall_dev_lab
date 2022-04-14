@@ -116,6 +116,24 @@
                     "outputs": {}
                 }
             }
+        },
+        {
+            "name": "linkedDeploymentNSG",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2021-04-01",
+            "location": "[parameters('location')]",
+            "dependsOn": [],
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "https://raw.githubusercontent.com/jtudong/pan_firewall_dev_lab/master/nsg.json",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parametersLink":{
+                    "uri": "https://raw.githubusercontent.com/jtudong/pan_firewall_dev_lab/master/nsg.parameters.json",
+                    "contentVersion": "1.0.0.0"
+                }
+            }
         }
     ],
     "outputs": {}
