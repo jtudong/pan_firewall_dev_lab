@@ -112,6 +112,98 @@
                                             ],
                                             "destinationAddressPrefixes": []
                                         }
+                                    },
+                                    {
+                                        "name": "AllowManagementInbound",
+                                        "properties": {
+                                            "description": "AllowManagementInbound",
+                                            "protocol": "Tcp",
+                                            "sourcePortRange": "*",
+                                            "destinationPortRange": "443",
+                                            "destinationAddressPrefix": "*",
+                                            "access": "Allow",
+                                            "priority": 1300,
+                                            "direction": "Inbound",
+                                            "sourceAddressPrefixes": [
+                                                "63.156.58.20/32",
+                                                "4.1.98.242/32",
+                                                "72.208.101.143/32"
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "name": "DenyAllInBound",
+                                        "properties": {
+                                            "description": "DenyAllInBound",
+                                            "protocol": "*",
+                                            "sourcePortRange": "*",
+                                            "destinationPortRange": "*",
+                                            "sourceAddressPrefix": "*",
+                                            "destinationAddressPrefix": "*",
+                                            "access": "Deny",
+                                            "priority": 1400,
+                                            "direction": "Inbound",
+                                            "sourcePortRanges": [],
+                                            "destinationPortRanges": [],
+                                            "sourceAddressPrefixes": [],
+                                            "destinationAddressPrefixes": []
+                                        }
+                                    },
+                                    {
+                                        "name": "AllowAzFoodsOutBound",
+                                        "properties": {
+                                            "description": "AllowAzFoodsOutBound",
+                                            "protocol": "*",
+                                            "sourcePortRange": "*",
+                                            "destinationPortRange": "*",
+                                            "sourceAddressPrefix": "*",
+                                            "destinationAddressPrefix": "172.16.252.0/22",
+                                            "access": "Allow",
+                                            "priority": 1000,
+                                            "direction": "Outbound",
+                                            "sourcePortRanges": [],
+                                            "destinationPortRanges": [],
+                                            "sourceAddressPrefixes": [],
+                                            "destinationAddressPrefixes": []
+                                        }
+                                    },
+                                    {
+                                        "name": "AllowDCsOutBound",
+                                        "properties": {
+                                            "description": "AllowDCsOutBound",
+                                            "protocol": "*",
+                                            "sourcePortRange": "*",
+                                            "destinationPortRange": "*",
+                                            "sourceAddressPrefix": "*",
+                                            "access": "Allow",
+                                            "priority": 1100,
+                                            "direction": "Outbound",
+                                            "sourcePortRanges": [],
+                                            "destinationPortRanges": [],
+                                            "sourceAddressPrefixes": [],
+                                            "destinationAddressPrefixes": [
+                                                "172.17.2.44/32",
+                                                "172.17.1.159/32"
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "name": "DenyToVnetOutbound",
+                                        "properties": {
+                                            "description": "DenyToVnetOutbound",
+                                            "protocol": "*",
+                                            "sourcePortRange": "*",
+                                            "destinationPortRange": "*",
+                                            "sourceAddressPrefix": "*",
+                                            "destinationAddressPrefix": "10.117.0.0/16",
+                                            "access": "Deny",
+                                            "priority": 1200,
+                                            "direction": "Outbound",
+                                            "sourcePortRanges": [],
+                                            "destinationPortRanges": [],
+                                            "sourceAddressPrefixes": [],
+                                            "destinationAddressPrefixes": []
+                                        }
                                     }
                                 ]
                             }
