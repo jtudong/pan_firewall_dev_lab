@@ -122,16 +122,20 @@
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2021-04-01",
             "location": "[parameters('location')]",
-            "dependsOn": [],
+            "dependsOn": ["[resourceId('Microsoft.Resources/resourceGroups', parameters('vnetResourceGroupName'))]"],
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
                     "uri": "https://raw.githubusercontent.com/jtudong/pan_firewall_dev_lab/nsg/nsg.json",
                     "contentVersion": "1.0.0.0"
                 },
-                "parametersLink":{
-                    "uri": "https://raw.githubusercontent.com/jtudong/pan_firewall_dev_lab/master/nsg.parameters.json",
-                    "contentVersion": "1.0.0.0"
+                "parameters": {
+                    "location": {
+                        "value": "[parameters('location')]"
+                    },
+                    "environment": {
+                        "value": "[parameters('environment')]"
+                    }
                 }
             }
         }

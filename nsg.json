@@ -18,6 +18,13 @@
                 "dev",
                 "sandbox"
             ]
+        },
+        "firewallResourceGroupName": {
+            "type": "string",
+            //"defaultValue": "sfc-firewall-dev-rg__",
+            "metadata": {
+                "description": "The name of the resource group to contain the nsg"
+            }
         }
     },
     "functions": [],
@@ -35,7 +42,7 @@
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2021-04-01",
             "condition": true,
-            "resourceGroup": "sfc-firewall-dev-rg__",
+            "resourceGroup": "[parameters('firewallResourceGroupName')]",
             "properties": {
                 "mode": "Incremental",
                 "template": {
