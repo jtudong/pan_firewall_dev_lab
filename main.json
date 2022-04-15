@@ -135,6 +135,9 @@
                     },
                     "environment": {
                         "value": "[parameters('environment')]"
+                    },
+                    "firewallResourceGroupName": {
+                        "value": "[parameters('firewallResourceGroupName')]"
                     }
                 }
             }
