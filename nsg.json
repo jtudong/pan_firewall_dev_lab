@@ -485,7 +485,12 @@
                             }
                         }
                     ],
-                    "outputs": {}
+                    "outputs": {
+                        "firewall-management-dev-nsg": {
+                            "type": "string",
+                            "value": "[resourceId('Microsoft.Network/networkSecurityGroups','firewall-management-dev-nsg')]"
+                        }
+                    }
                 }
             }
         }
