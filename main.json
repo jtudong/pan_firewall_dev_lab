@@ -2,6 +2,13 @@
     "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
+        "branch": {
+            "type": "string",
+            "metadata": {
+                "description": "The name of the current branch"
+            },
+            "defaultValue": "master"
+        },
         "environment": {
             "type": "string",
             "metadata": {
@@ -22,7 +29,7 @@
         "location": {
             "type": "string",
             "metadata": {
-                "description":  "The region for the VNet"
+                "description": "The region for the VNet"
             }
         },
         "virtualNetworkName": {
@@ -45,7 +52,8 @@
             "Team": "networking",
             "Environment": "[parameters('environment')]",
             "Application": "network"
-        }
+        },
+        "templateBaseUrl": "[concat('https://raw.githubusercontent.com/jtudong/pan_firewall_dev_lab/',parameters('branch'),'/')]"
     },
     "resources": [
         {
@@ -125,11 +133,11 @@
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2021-04-01",
             "location": "[parameters('location')]",
-            "dependsOn": ["[resourceId('Microsoft.Resources/resourceGroups', parameters('vnetResourceGroupName'))]"],
+            "dependsOn": ["[resourceId('Microsoft.Resources/resourceGroups', parameters('vnetResourceGroupName'))]" ],
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
-                    "uri": "https://raw.githubusercontent.com/jtudong/pan_firewall_dev_lab/attach_nsg/nsg.json",
+                    "uri": "[uri(variables('templateBaseUrl'),'nsg.json')]",
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
