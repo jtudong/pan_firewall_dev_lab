@@ -70,7 +70,10 @@
             "apiVersion": "2021-04-01",
             "condition": true,
             "resourceGroup": "[parameters('vnetResourceGroupName')]",
-            "dependsOn": ["[resourceId('Microsoft.Resources/resourceGroups', parameters('vnetResourceGroupName'))]"],
+            "dependsOn": [
+                "[resourceId('Microsoft.Resources/resourceGroups', parameters('vnetResourceGroupName'))]",
+                "[resourceId('Microsoft.Resources/deployments', 'linkedDeploymentNSG')]"
+            ],
             "properties": {
                 "mode": "Incremental",
                 "template": {
