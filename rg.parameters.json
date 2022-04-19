@@ -7,6 +7,12 @@
         },
         "location": {
             "value": "westus3"
+        },
+        "vnetResourceGroupName": {
+            "value": "sfc-network-dev-rg__"
+        },
+        "firewallResourceGroupName": {
+            "value": "sfc-firewall-dev-rg__"
         }
     }
 }
