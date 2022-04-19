@@ -86,7 +86,7 @@
             "condition": true,
             "resourceGroup": "[parameters('vnetResourceGroupName')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Resources/resourceGroups', parameters('vnetResourceGroupName'))]"/* ,
+                "[resourceId('Microsoft.Resources/resourceGroups', parameters('vnetResourceGroupName'))]" /* ,
                 "[resourceId('Microsoft.Resources/deployments', 'linkedDeploymentNSG')]" */
             ],
             "properties": {
@@ -112,7 +112,8 @@
                                     {
                                         "name": "firewall-management",
                                         "properties": {
-                                            "addressPrefix": "10.16.4.0/24"
+                                            "addressPrefix": "10.16.4.0/24",
+                                            "networkSecurityGroup": "[reference('linkedDeploymentNSG').outputs.management.value]"
                                         }
                                     },
                                     {
@@ -140,7 +141,7 @@
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2021-04-01",
             "resourceGroup": "[parameters('firewallResourceGroupName')]",
-            "dependsOn": ["[resourceId('Microsoft.Resources/resourceGroups', parameters('firewallResourceGroupName'))]"],
+            "dependsOn": [ "[resourceId('Microsoft.Resources/resourceGroups', parameters('firewallResourceGroupName'))]" ],
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
