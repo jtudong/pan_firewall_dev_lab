@@ -139,7 +139,7 @@
                 "mode": "Incremental",
                 "templateLink": {
                     "uri": "https://raw.githubusercontent.com/jtudong/pan_firewall_dev_lab/nsg_rework/nsg.rework.json",
-                    "contentVersion": "1.0.0.0"
+                    "contentVersion": "1.0.0.1"
                 },
                 "parameters": {}
             }
