@@ -2,6 +2,13 @@
     "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
+        "gitBranch": {
+            "type": "string",
+            "metadata": {
+                "description": "The name of the current git branch"
+            },
+            "defaultValue": "master"
+        },
         "environment": {
             "type": "string",
             "metadata": {
@@ -45,7 +52,9 @@
             "Team": "networking",
             "Environment": "[parameters('environment')]",
             "Application": "network"
-        }
+        },
+        "templateBaseUrl": "[concat('https://raw.githubusercontent.com/jtudong/pan_firewall_dev_lab/',parameters('gitBranch'),'/')]",
+        "nsgTemplateUrl": "[uri(variables('templateBaseUrl'),'nsg.json')]"
     },
     "resources": [
         {
@@ -129,7 +138,7 @@
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
-                    "uri": "https://raw.githubusercontent.com/jtudong/pan_firewall_dev_lab/nsg_refactor/nsg.json",
+                    "uri": "[variables('nsgTemplateUrl')]",
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
