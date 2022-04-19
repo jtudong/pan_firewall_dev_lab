@@ -29,7 +29,7 @@
         "location": {
             "type": "string",
             "metadata": {
-                "description":  "The region for the VNet"
+                "description": "The region for the VNet"
             }
         },
         "virtualNetworkName": {
@@ -130,28 +130,17 @@
             }
         },
         {
-            "name": "linkedDeploymentNSG",
+            "name": "linkedDeployment1",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2021-04-01",
-            "location": "[parameters('location')]",
-            "dependsOn": ["[resourceId('Microsoft.Resources/resourceGroups', parameters('vnetResourceGroupName'))]"],
+            "resourceGroup": "[parameters('firewallResourceGroupName')]",
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
-                    "uri": "[variables('nsgTemplateUrl')]",
+                    "uri": "https://raw.githubusercontent.com/jtudong/pan_firewall_dev_lab/nsg_rework/nsg.rework.json",
                     "contentVersion": "1.0.0.0"
                 },
-                "parameters": {
-                    "location": {
-                        "value": "[parameters('location')]"
-                    },
-                    "environment": {
-                        "value": "[parameters('environment')]"
-                    },
-                    "firewallResourceGroupName": {
-                        "value": "[parameters('firewallResourceGroupName')]"
-                    }
-                }
+                "parameters": {}
             }
         }
     ],
