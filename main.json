@@ -112,8 +112,8 @@
                                     {
                                         "name": "firewall-management",
                                         "properties": {
-                                            "addressPrefix": "10.16.4.0/24",
-                                            "networkSecurityGroup": "[reference('linkedDeploymentNSG').outputs.management.value]"
+                                            "addressPrefix": "10.16.4.0/24"/* ,
+                                            "networkSecurityGroup": "[reference('linkedDeploymentNSG').outputs.management.value]" */
                                         }
                                     },
                                     {
