@@ -134,6 +134,7 @@
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2021-04-01",
             "resourceGroup": "[parameters('firewallResourceGroupName')]",
+            "dependsOn": ["[resourceId('Microsoft.Resources/resourceGroups', parameters('firewallResourceGroupName'))]"],
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
