@@ -141,7 +141,11 @@
                     "uri": "https://raw.githubusercontent.com/jtudong/pan_firewall_dev_lab/nsg_rework/nsg.rework.json",
                     "contentVersion": "1.0.0.1"
                 },
-                "parameters": {}
+                "parameters": {
+                    "location": {
+                        "value": "[parameters('location')]"
+                    }
+                }
             }
         }
     ],
