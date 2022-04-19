@@ -86,8 +86,8 @@
             "condition": true,
             "resourceGroup": "[parameters('vnetResourceGroupName')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Resources/resourceGroups', parameters('vnetResourceGroupName'))]" /* ,
-                "[resourceId('Microsoft.Resources/deployments', 'linkedDeploymentNSG')]" */
+                "[resourceId('Microsoft.Resources/resourceGroups', parameters('vnetResourceGroupName'))]",
+                "[resourceId('Microsoft.Resources/deployments', 'linkedDeploymentNSG')]"
             ],
             "properties": {
                 "mode": "Incremental",
