@@ -8,5 +8,3 @@ az group delete -n sfc-firewall-dev-rg__ --yes&&az group delete -n sfc-network-d
 
 az deployment sub validate -l westus3 -f main.json -p main.parameters.json
 az deployment sub create -c -l westus3 -f main.json -p main.parameters.json
-
-git add -A;git commit
