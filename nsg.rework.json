@@ -1,14 +1,75 @@
 {
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
-    "contentVersion": "1.0.0.0",
-    "parameters": {},
+    "contentVersion": "1.0.0.1",
+    "parameters": {
+        "location": {
+            "type": "string",
+            "metadata": {
+                "description": "The region for the VNet"
+            }
+        },
+        "environment": {
+            "type": "string",
+            "metadata": {
+                "description": "The name of the environment"
+            },
+            "allowedValues": [
+                "prod",
+                "dev",
+                "sandbox"
+            ]
+        }
+    },
     "functions": [],
-    "variables": {},
-    "resources": [],
+    "variables": {
+        "tags": {
+            "Department": "it",
+            "Team": "networking",
+            "Environment": "[parameters('environment')]",
+            "Application": "network"
+        }
+    },
+    "resources": [
+        {
+            "name": "firewall-management-dev-nsg",
+            "type": "Microsoft.Network/networkSecurityGroups",
+            "apiVersion": "2020-11-01",
+            "location": "[parameters('location')]",
+            "tags": "[variables('tags')]",
+            "properties": {
+                "securityRules": [
+                    {
+                        "name": "AllowAzFoodsInBound",
+                        "properties": {
+                            "description": "AllowAzFoodsInBound",
+                            "protocol": "*",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "*",
+                            "destinationAddressPrefix": "*",
+                            "access": "Allow",
+                            "priority": 1000,
+                            "direction": "Inbound",
+                            "sourcePortRanges": [],
+                            "destinationPortRanges": [],
+                            "sourceAddressPrefixes": [
+                                "172.16.252.0/22",
+                                "10.123.23.57/32"
+                            ],
+                            "destinationAddressPrefixes": []
+                        }
+                    }
+                ]
+            }
+        }
+    ],
     "outputs": {
         "output1": {
             "type": "string",
-            "value": "branch nsg_rework, nsg.rework.json"
+            "value": "branch nsg_rework, nsg.rework.json v1.0.0.1 "
+        },
+        "firewall-management-dev-nsg": {
+            "type": "string",
+            "value": "[resourceId('Microsoft.Network/networkSecurityGroups','firewall-management-dev-nsg')]"
         }
     }
 }
