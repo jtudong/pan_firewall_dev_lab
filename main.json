@@ -63,7 +63,7 @@
         "nsgTemplateUrl": "[uri(variables('templateBaseUrl'),parameters('nsgDeploymentTemplateName'))]"
     },
     "resources": [
-        {
+        /* {
             "name": "[parameters('vnetResourceGroupName')]",
             "type": "Microsoft.Resources/resourceGroups",
             "apiVersion": "2021-04-01",
@@ -78,17 +78,14 @@
             "location": "[parameters('location')]",
             "dependsOn": [],
             "tags": {}
-        },
+        }, */
         {
             "name": "vnetDeployment",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2021-04-01",
             "condition": true,
             "resourceGroup": "[parameters('vnetResourceGroupName')]",
-            "dependsOn": [
-                "[resourceId('Microsoft.Resources/resourceGroups', parameters('vnetResourceGroupName'))]",
-                "[resourceId('Microsoft.Resources/deployments', 'linkedDeploymentNSG')]"
-            ],
+            "dependsOn": [],
             "properties": {
                 "mode": "Incremental",
                 "template": {
@@ -140,6 +137,7 @@
             "name": "linkedDeploymentNSG",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2021-04-01",
+            "condition": false,
             "resourceGroup": "[parameters('firewallResourceGroupName')]",
             "dependsOn": [ "[resourceId('Microsoft.Resources/resourceGroups', parameters('firewallResourceGroupName'))]" ],
             "properties": {
@@ -159,10 +157,5 @@
             }
         }
     ],
-    "outputs": {
-        "management": {
-            "type": "string",
-            "value": "[reference('linkedDeploymentNSG').outputs.management.value]"
-        }
-    }
+    "outputs": {}
 }
