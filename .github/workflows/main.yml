@@ -31,5 +31,6 @@ jobs:
           subscriptionID: ${{ env.subscription_id}}
           region: ${{ env.location}}
           template: ./rg.json
+          parameters: ./rg.parameters.json
           deploymentName: resourcegroup
 
