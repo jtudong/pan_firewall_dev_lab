@@ -1,5 +1,5 @@
 {
-    "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#",
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
         "environment": {
@@ -13,19 +13,6 @@
                 "sandbox"
             ]
         },
-        "firewallResourceGroupName": {
-            "type": "string",
-            "metadata": {
-                "description": "The name of the firewall resource group"
-            }
-        },
-        "gitBranch": {
-            "type": "string",
-            "metadata": {
-                "description": "The name of the current git branch"
-            },
-            "defaultValue": ""
-        },
         "location": {
             "type": "string",
             "metadata": {
@@ -37,18 +24,6 @@
             "metadata": {
                 "description": "The name of the VNET"
             }
-        },
-        "vnetResourceGroupName": {
-            "type": "string",
-            "metadata": {
-                "description": "The name of the VNET resource group"
-            }
-        },
-        "nsgDeploymentTemplateName": {
-            "type": "string",
-            "metadata": {
-                "description": "The name of the NSG template"
-            }
         }
     },
     "functions": [],
@@ -58,102 +33,36 @@
             "Team": "networking",
             "Environment": "[parameters('environment')]",
             "Application": "network"
-        },
-        "templateBaseUrl": "[concat('https://raw.githubusercontent.com/jtudong/pan_firewall_dev_lab/',parameters('gitBranch'),'/')]",
-        "nsgTemplateUrl": "[uri(variables('templateBaseUrl'),parameters('nsgDeploymentTemplateName'))]"
+        }
     },
     "resources": [
-        /* {
-            "name": "[parameters('vnetResourceGroupName')]",
-            "type": "Microsoft.Resources/resourceGroups",
-            "apiVersion": "2021-04-01",
-            "location": "[parameters('location')]",
-            "dependsOn": [],
-            "tags": {}
-        },
         {
-            "name": "[parameters('firewallResourceGroupName')]",
-            "type": "Microsoft.Resources/resourceGroups",
-            "apiVersion": "2021-04-01",
-            "location": "[parameters('location')]",
-            "dependsOn": [],
-            "tags": {}
-        }, */
-        {
-            "name": "vnetDeployment",
-            "type": "Microsoft.Resources/deployments",
-            "apiVersion": "2021-04-01",
+            "name": "[parameters('virtualNetworkName')]",
+            "type": "Microsoft.Network/virtualNetworks",
+            "apiVersion": "2020-11-01",
             "condition": true,
-            "resourceGroup": "[parameters('vnetResourceGroupName')]",
-            "dependsOn": [],
+            "location": "[parameters('location')]",
+            "tags": "[variables('tags')]",
             "properties": {
-                "mode": "Incremental",
-                "template": {
-                    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
-                    "contentVersion": "1.0.0.0",
-                    "variables": {},
-                    "resources": [
-                        {
-                            "name": "[parameters('virtualNetworkName')]",
-                            "type": "Microsoft.Network/virtualNetworks",
-                            "apiVersion": "2020-11-01",
-                            "location": "[parameters('location')]",
-                            "tags": "[variables('tags')]",
-                            "properties": {
-                                "addressSpace": {
-                                    "addressPrefixes": [
-                                        "10.16.0.0/16"
-                                    ]
-                                },
-                                "subnets": [
-                                    {
-                                        "name": "firewall-management",
-                                        "properties": {
-                                            "addressPrefix": "10.16.4.0/24"/* ,
-                                            "networkSecurityGroup": "[reference('linkedDeploymentNSG').outputs.management.value]" */
-                                        }
-                                    },
-                                    {
-                                        "name": "firewall-untrusted",
-                                        "properties": {
-                                            "addressPrefix": "10.16.2.0/24"
-                                        }
-                                    },
-                                    {
-                                        "name": "firewall-trusted",
-                                        "properties": {
-                                            "addressPrefix": "10.16.3.0/24"
-                                        }
-                                    }
-                                ]
-                            }
-                        }
-                    ],
-                    "outputs": {}
-                }
-            }
-        },
-        {
-            "name": "linkedDeploymentNSG",
-            "type": "Microsoft.Resources/deployments",
-            "apiVersion": "2021-04-01",
-            "condition": false,
-            "resourceGroup": "[parameters('firewallResourceGroupName')]",
-            "dependsOn": [ "[resourceId('Microsoft.Resources/resourceGroups', parameters('firewallResourceGroupName'))]" ],
-            "properties": {
-                "mode": "Incremental",
-                "templateLink": {
-                    "uri": "[variables('nsgTemplateUrl')]",
-                    "contentVersion": "1.0.0.1"
+                "addressSpace": {
+                    "addressPrefixes": [
+                        "10.16.0.0/16"
+                    ]
                 },
-                "parameters": {
-                    "location": {
-                        "value": "[parameters('location')]"
+                "subnets": [
+                    {
+                        "name": "firewall-management",
+                        "properties": {
+                            "addressPrefix": "10.16.4.0/24"
+                        }
                     },
-                    "environment": {
-                        "value": "[parameters('environment')]"
+                    {
+                        "name": "firewall-untrusted",
+                        "properties": {
+                            "addressPrefix": "10.16.2.0/24"
+                        }
                     }
-                }
+                ]
             }
         }
     ],

@@ -2,26 +2,14 @@
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "gitBranch": {
-            "value": "nsg_rework"
-        },
         "location": {
-            "value": "westus2"
+            "value": "westus3"
         },
         "environment": {
             "value": "dev"
         },
         "virtualNetworkName": {
             "value": "sfc01-wu3-dev-vnet__"
-        },
-        "vnetResourceGroupName": {
-            "value": "sfc-network-dev-rg__"
-        },
-        "firewallResourceGroupName": {
-            "value": "sfc-firewall-dev-rg__"
-        },
-        "nsgDeploymentTemplateName": {
-            "value": "nsg.rework.json"
         }
     }
 }
