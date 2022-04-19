@@ -6,6 +6,7 @@ on:
   push:
     branches:
       - master
+      - main_rework
   workflow_dispatch:
 
 env:
