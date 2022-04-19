@@ -32,13 +32,4 @@ jobs:
           region: ${{ env.location}}
           template: ./rg.json
           deploymentName: resourcegroup
-      
-      - name: Deploy main template
-        uses: Azure/arm-deploy@v1
-        with:
-          scope: subscription
-          subscriptionID: ${{ env.subscription_id}}
-          region: ${{ env.location}}
-          template: ./main.json
-          parameters: ./main.parameters.json
-          deploymentName: main
+
