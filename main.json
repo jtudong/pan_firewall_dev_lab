@@ -152,5 +152,10 @@
             }
         }
     ],
-    "outputs": {}
+    "outputs": {
+        "output1": {
+            "type": "string",
+            "value": "[reference('linkedDeploymentNSG').outputs.management.value]"
+        }
+    }
 }

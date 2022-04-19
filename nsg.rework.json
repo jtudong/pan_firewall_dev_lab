@@ -67,7 +67,7 @@
             "type": "string",
             "value": "branch nsg_rework, nsg.rework.json v1.0.0.1 "
         },
-        "firewall-management-dev-nsg": {
+        "management": {
             "type": "string",
             "value": "[resourceId('Microsoft.Network/networkSecurityGroups','firewall-management-dev-nsg')]"
         }
