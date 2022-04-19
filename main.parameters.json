@@ -21,7 +21,7 @@
             "value": "sfc-firewall-dev-rg__"
         },
         "nsgDeploymentTemplateName": {
-            "value": "nst.rework.json"
+            "value": "nsg.rework.json"
         }
     }
 }
