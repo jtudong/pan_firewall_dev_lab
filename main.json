@@ -61,6 +61,12 @@
                         "properties": {
                             "addressPrefix": "10.16.2.0/24"
                         }
+                    },
+                    {
+                        "name": "firewall-trusted",
+                        "properties": {
+                            "addressPrefix": "10.16.3.0/24"
+                        }
                     }
                 ]
             }
