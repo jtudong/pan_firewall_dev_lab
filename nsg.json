@@ -21,7 +21,6 @@
         },
         "firewallResourceGroupName": {
             "type": "string",
-            //"defaultValue": "sfc-firewall-dev-rg__",
             "metadata": {
                 "description": "The name of the resource group to contain the nsg"
             }
