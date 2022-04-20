@@ -80,7 +80,7 @@
                         "properties": {
                             "addressPrefix": "10.16.4.0/24",
                             "networkSecurityGroup": {
-                                "id": "[reference('linkedDeploymentNSG').outputs.management.value]"
+                                "id": "[reference('linkedDeploymentNSG').outputs.managementNSG.value]"
                             }
                         }
                     },
