@@ -6,7 +6,7 @@
             "value": "dev"
         },
         "location": {
-            "value": "westus3"
+            "value": "westus2"
         },
         "vnetResourceGroupName": {
             "value": "sfc-network-dev-rg__"
