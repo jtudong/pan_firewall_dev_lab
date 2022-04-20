@@ -14,7 +14,7 @@ env:
   subscriptionID: 6081cfb9-7cb9-4b84-8be8-337fdcac59f6
 
 jobs:
-  armDeploy:
+  armDeployResourceGroup:
     runs-on: ubuntu-latest
 
     steps:
@@ -35,3 +35,24 @@ jobs:
           parameters: ./rg.parameters.json
           deploymentName: resourcegroup
 
+  armDeployMainTemplate:
+    runs-on:  ubuntu-latest
+    needs:  armDeployResourceGroup
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Azure Login
+        uses: Azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIAL_VS_SANDBOX }}
+
+      - name: deploy-main-template
+        uses: Azure/arm-deploy@v1
+        with:
+          scope: resourcegroup
+          resourceGroupName:  sfc-network-dev-rg__
+          subscriptionID: ${{ env.subscription_id}}
+          region: ${{ env.location}}
+          template: ./main.json
+          parameters: ./main.parameters.json
+          deploymentName: main
