@@ -15,7 +15,7 @@
             "value": "sfc-firewall-dev-rg__"
         },
         "gitBranch": {
-            "value": "main_rework"
+            "value": "nsg_rework"
         },
         "nsgDeploymentTemplateName": {
             "value": "nsg.json"
