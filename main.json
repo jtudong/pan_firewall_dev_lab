@@ -98,7 +98,7 @@
                         "properties": {
                             "addressPrefix": "10.16.3.0/24",
                             "networkSecurityGroup": {
-                                "id": "[reference('linkedDeploymentNSG').outputs.trustedtNSG.value]"
+                                "id": "[reference('linkedDeploymentNSG').outputs.trustedNSG.value]"
                             }
                         }
                     }
