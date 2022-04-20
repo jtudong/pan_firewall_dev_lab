@@ -64,6 +64,7 @@
             "condition": true,
             "location": "[parameters('location')]",
             "dependsOn": [
+                // deployment is in a different resource group so it must be added to the resourceID string
                 "[resourceId(parameters('firewallResourceGroupName'),'Microsoft.Resources/deployments', 'linkedDeploymentNSG')]"
             ],
             "tags": "[variables('tags')]",
@@ -77,7 +78,10 @@
                     {
                         "name": "firewall-management",
                         "properties": {
-                            "addressPrefix": "10.16.4.0/24"
+                            "addressPrefix": "10.16.4.0/24",
+                            "networkSecurityGroup": {
+                                "id": "[reference('linkedDeploymentNSG').outputs.management.value]"
+                            }
                         }
                     },
                     {
