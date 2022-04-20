@@ -3,13 +3,13 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "location": {
-            "value": "westus3"
+            "value": "westus2"
         },
         "environment": {
             "value": "dev"
         },
         "virtualNetworkName": {
-            "value": "sfc01-wu3-dev-vnet__"
+            "value": "sfc01-wu2-dev-vnet__"
         },
         "firewallResourceGroupName": {
             "value": "sfc-firewall-dev-rg__"
