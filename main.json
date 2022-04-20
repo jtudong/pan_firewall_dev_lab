@@ -65,6 +65,7 @@
             "location": "[parameters('location')]",
             "dependsOn": [
             //    "[resourceId('Microsoft.Resources/deployments', 'linkedDeploymentNSG')]"
+            "/subscriptions/6081cfb9-7cb9-4b84-8be8-337fdcac59f6/resourceGroups/sfc-network-dev-rg__/providers/Microsoft.Resources/deployments/linkedDeploymentNSG"
             ],
             "tags": "[variables('tags')]",
             "properties": {
