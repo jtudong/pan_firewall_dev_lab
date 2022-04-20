@@ -12,6 +12,7 @@ on:
 env:
   location: westus3
   subscriptionID: 6081cfb9-7cb9-4b84-8be8-337fdcac59f6
+  networkResourceGroup: sfc-network-dev-rg__
 
 jobs:
   armDeployResourceGroup:
@@ -50,7 +51,7 @@ jobs:
         uses: Azure/arm-deploy@v1
         with:
           scope: resourcegroup
-          resourceGroupName:  sfc-network-dev-rg__
+          resourceGroupName:  ${{ env.networkResourceGroup }}
           subscriptionID: ${{ env.subscription_id}}
           region: ${{ env.location}}
           template: ./main.json
