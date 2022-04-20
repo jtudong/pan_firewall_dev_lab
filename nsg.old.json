@@ -1,0 +1,498 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "location": {
+            "type": "string",
+            "metadata": {
+                "description": "The region for the VNet"
+            }
+        },
+        "environment": {
+            "type": "string",
+            "metadata": {
+                "description": "The name of the environment"
+            },
+            "allowedValues": [
+                "prod",
+                "dev",
+                "sandbox"
+            ]
+        },
+        "firewallResourceGroupName": {
+            "type": "string",
+            "metadata": {
+                "description": "The name of the resource group to contain the nsg"
+            }
+        }
+    },
+    "functions": [],
+    "variables": {
+        "tags": {
+            "Department": "it",
+            "Team": "networking",
+            "Environment": "[parameters('environment')]",
+            "Application": "network"
+        }
+    },
+    "resources": [
+        {
+            "name": "nsgDeployment",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2021-04-01",
+            "condition": true,
+            "resourceGroup": "[parameters('firewallResourceGroupName')]",
+            "properties": {
+                "mode": "Incremental",
+                "template": {
+                    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+                    "contentVersion": "1.0.0.0",
+                    "variables": {},
+                    "resources": [
+                        {
+                            "name": "firewall-management-dev-nsg",
+                            "type": "Microsoft.Network/networkSecurityGroups",
+                            "apiVersion": "2020-11-01",
+                            "location": "[parameters('location')]",
+                            "tags": "[variables('tags')]",
+                            "properties": {
+                                "securityRules": [
+                                    {
+                                        "name": "AllowAzFoodsInBound",
+                                        "properties": {
+                                            "description": "AllowAzFoodsInBound",
+                                            "protocol": "*",
+                                            "sourcePortRange": "*",
+                                            "destinationPortRange": "*",
+                                            "destinationAddressPrefix": "*",
+                                            "access": "Allow",
+                                            "priority": 1000,
+                                            "direction": "Inbound",
+                                            "sourcePortRanges": [],
+                                            "destinationPortRanges": [],
+                                            "sourceAddressPrefixes": [
+                                                "172.16.252.0/22",
+                                                "10.123.23.57/32"
+                                            ],
+                                            "destinationAddressPrefixes": []
+                                        }
+                                    },
+                                    {
+                                        "name": "AllowDCsInBound",
+                                        "properties": {
+                                            "description": "AllowDCsInBound",
+                                            "protocol": "*",
+                                            "sourcePortRange": "*",
+                                            "destinationPortRange": "*",
+                                            "destinationAddressPrefix": "*",
+                                            "access": "Allow",
+                                            "priority": 1100,
+                                            "direction": "Inbound",
+                                            "sourcePortRanges": [],
+                                            "destinationPortRanges": [],
+                                            "sourceAddressPrefixes": [
+                                                "172.17.2.44/32",
+                                                "172.17.1.159/32"
+                                            ],
+                                            "destinationAddressPrefixes": []
+                                        }
+                                    },
+                                    {
+                                        "name": "GlobalProtect",
+                                        "properties": {
+                                            "description": "GlobalProtect",
+                                            "protocol": "*",
+                                            "sourcePortRange": "*",
+                                            "destinationPortRange": "*",
+                                            "destinationAddressPrefix": "*",
+                                            "access": "Allow",
+                                            "priority": 1200,
+                                            "direction": "Inbound",
+                                            "sourcePortRanges": [],
+                                            "destinationPortRanges": [],
+                                            "sourceAddressPrefixes": [
+                                                "10.10.20.0/22",
+                                                "10.10.24.0/24",
+                                                "10.10.200.0/21",
+                                                "10.10.210.0/23"
+                                            ],
+                                            "destinationAddressPrefixes": []
+                                        }
+                                    },
+                                    {
+                                        "name": "AllowManagementInbound",
+                                        "properties": {
+                                            "description": "AllowManagementInbound",
+                                            "protocol": "Tcp",
+                                            "sourcePortRange": "*",
+                                            "destinationPortRange": "443",
+                                            "destinationAddressPrefix": "*",
+                                            "access": "Allow",
+                                            "priority": 1300,
+                                            "direction": "Inbound",
+                                            "sourceAddressPrefixes": [
+                                                "63.156.58.20/32",
+                                                "4.1.98.242/32",
+                                                "72.208.101.143/32"
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "name": "DenyAllInBound",
+                                        "properties": {
+                                            "description": "DenyAllInBound",
+                                            "protocol": "*",
+                                            "sourcePortRange": "*",
+                                            "destinationPortRange": "*",
+                                            "sourceAddressPrefix": "*",
+                                            "destinationAddressPrefix": "*",
+                                            "access": "Deny",
+                                            "priority": 1400,
+                                            "direction": "Inbound",
+                                            "sourcePortRanges": [],
+                                            "destinationPortRanges": [],
+                                            "sourceAddressPrefixes": [],
+                                            "destinationAddressPrefixes": []
+                                        }
+                                    },
+                                    {
+                                        "name": "AllowAzFoodsOutBound",
+                                        "properties": {
+                                            "description": "AllowAzFoodsOutBound",
+                                            "protocol": "*",
+                                            "sourcePortRange": "*",
+                                            "destinationPortRange": "*",
+                                            "sourceAddressPrefix": "*",
+                                            "destinationAddressPrefix": "172.16.252.0/22",
+                                            "access": "Allow",
+                                            "priority": 1000,
+                                            "direction": "Outbound",
+                                            "sourcePortRanges": [],
+                                            "destinationPortRanges": [],
+                                            "sourceAddressPrefixes": [],
+                                            "destinationAddressPrefixes": []
+                                        }
+                                    },
+                                    {
+                                        "name": "AllowDCsOutBound",
+                                        "properties": {
+                                            "description": "AllowDCsOutBound",
+                                            "protocol": "*",
+                                            "sourcePortRange": "*",
+                                            "destinationPortRange": "*",
+                                            "sourceAddressPrefix": "*",
+                                            "access": "Allow",
+                                            "priority": 1100,
+                                            "direction": "Outbound",
+                                            "sourcePortRanges": [],
+                                            "destinationPortRanges": [],
+                                            "sourceAddressPrefixes": [],
+                                            "destinationAddressPrefixes": [
+                                                "172.17.2.44/32",
+                                                "172.17.1.159/32"
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "name": "DenyToVnetOutbound",
+                                        "properties": {
+                                            "description": "DenyToVnetOutbound",
+                                            "protocol": "*",
+                                            "sourcePortRange": "*",
+                                            "destinationPortRange": "*",
+                                            "sourceAddressPrefix": "*",
+                                            "destinationAddressPrefix": "10.16.0.0/16",
+                                            "access": "Deny",
+                                            "priority": 1200,
+                                            "direction": "Outbound",
+                                            "sourcePortRanges": [],
+                                            "destinationPortRanges": [],
+                                            "sourceAddressPrefixes": [],
+                                            "destinationAddressPrefixes": []
+                                        }
+                                    }
+                                ]
+                            }
+                        },
+                        {
+                            "name": "firewall-trusted-dev-nsg",
+                            "type": "Microsoft.Network/networkSecurityGroups",
+                            "apiVersion": "2020-11-01",
+                            "location": "[parameters('location')]",
+                            "tags": "[variables('tags')]",
+                            "properties": {
+                                "securityRules": [
+                                    {
+                                        "name": "AllowAzFoodsInBound",
+                                        "properties": {
+                                            "description": "AllowAzFoodsInBound",
+                                            "protocol": "*",
+                                            "sourcePortRange": "*",
+                                            "destinationPortRange": "*",
+                                            "sourceAddressPrefix": "172.16.252.0/22",
+                                            "destinationAddressPrefix": "*",
+                                            "access": "Allow",
+                                            "priority": 1000,
+                                            "direction": "Inbound"
+                                        }
+                                    },
+                                    {
+                                        "name": "AllowDCsInBound",
+                                        "properties": {
+                                            "description": "AllowDCsInBound",
+                                            "protocol": "*",
+                                            "sourcePortRange": "*",
+                                            "destinationPortRange": "*",
+                                            "destinationAddressPrefix": "*",
+                                            "access": "Allow",
+                                            "priority": 1100,
+                                            "direction": "Inbound",
+                                            "sourceAddressPrefixes": [
+                                                "172.17.2.44/32",
+                                                "172.17.1.159/32"
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "name": "GlobalProtect",
+                                        "properties": {
+                                            "description": "GlobalProtect",
+                                            "protocol": "*",
+                                            "sourcePortRange": "*",
+                                            "destinationPortRange": "*",
+                                            "destinationAddressPrefix": "*",
+                                            "access": "Allow",
+                                            "priority": 1200,
+                                            "direction": "Inbound",
+                                            "sourceAddressPrefixes": [
+                                                "10.10.20.0/22",
+                                                "10.10.24.0/24",
+                                                "10.10.200.0/21"
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "name": "DenyFirewallUntrustInBound",
+                                        "properties": {
+                                            "description": "DenyFirewallUntrustInBound",
+                                            "protocol": "*",
+                                            "sourcePortRange": "*",
+                                            "destinationPortRange": "*",
+                                            "sourceAddressPrefix": "10.16.2.0/24",
+                                            "destinationAddressPrefix": "*",
+                                            "access": "Deny",
+                                            "priority": 1300,
+                                            "direction": "Inbound"
+                                        }
+                                    },
+                                    {
+                                        "name": "DenyFirewallMgmtInBound",
+                                        "properties": {
+                                            "description": "DenyFirewallMgmtInBound",
+                                            "protocol": "*",
+                                            "sourcePortRange": "*",
+                                            "destinationPortRange": "*",
+                                            "sourceAddressPrefix": "10.16.4.0/24",
+                                            "destinationAddressPrefix": "*",
+                                            "access": "Deny",
+                                            "priority": 1400,
+                                            "direction": "Inbound"
+                                        }
+                                    },
+                                    {
+                                        "name": "AllowInternalWebInbound",
+                                        "properties": {
+                                            "description": "AllowInternalWebInbound",
+                                            "protocol": "*",
+                                            "sourcePortRange": "*",
+                                            "sourceAddressPrefix": "*",
+                                            "destinationAddressPrefix": "*",
+                                            "access": "Allow",
+                                            "priority": 1500,
+                                            "direction": "Inbound",
+                                            "destinationPortRanges": [
+                                                "443",
+                                                "80"
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "name": "AllowAzFoodsOutBound",
+                                        "properties": {
+                                            "description": "AllowAzFoodsOutBound",
+                                            "protocol": "*",
+                                            "sourcePortRange": "*",
+                                            "destinationPortRange": "*",
+                                            "sourceAddressPrefix": "*",
+                                            "destinationAddressPrefix": "172.16.252.0/22",
+                                            "access": "Allow",
+                                            "priority": 1000,
+                                            "direction": "Outbound"
+                                        }
+                                    },
+                                    {
+                                        "name": "AllowDCsOutBound",
+                                        "properties": {
+                                            "description": "AllowDCsOutBound",
+                                            "protocol": "*",
+                                            "sourcePortRange": "*",
+                                            "destinationPortRange": "*",
+                                            "sourceAddressPrefix": "*",
+                                            "access": "Allow",
+                                            "priority": 1100,
+                                            "direction": "Outbound",
+                                            "destinationAddressPrefixes": [
+                                                "172.17.2.44/32",
+                                                "172.17.1.159/32"
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "name": "GlobalProtectOutBound",
+                                        "properties": {
+                                            "description": "GlobalProtectOutBound",
+                                            "protocol": "*",
+                                            "sourcePortRange": "*",
+                                            "destinationPortRange": "*",
+                                            "sourceAddressPrefix": "*",
+                                            "access": "Allow",
+                                            "priority": 1200,
+                                            "direction": "Outbound",
+                                            "destinationAddressPrefixes": [
+                                                "10.10.20.0/22",
+                                                "10.10.24.0/24",
+                                                "10.10.200.0/21"
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "name": "DenyFirewallUntrustOutBound",
+                                        "properties": {
+                                            "description": "DenyFirewallUntrustOutBound",
+                                            "protocol": "*",
+                                            "sourcePortRange": "*",
+                                            "destinationPortRange": "*",
+                                            "sourceAddressPrefix": "*",
+                                            "destinationAddressPrefix": "10.16.2.0/24",
+                                            "access": "Deny",
+                                            "priority": 1300,
+                                            "direction": "Outbound"
+                                        }
+                                    },
+                                    {
+                                        "name": "DenyFirewallMgmtOutBound",
+                                        "properties": {
+                                            "description": "DenyFirewallMgmtOutBound",
+                                            "protocol": "*",
+                                            "sourcePortRange": "*",
+                                            "destinationPortRange": "*",
+                                            "sourceAddressPrefix": "*",
+                                            "destinationAddressPrefix": "10.16.4.0/24",
+                                            "access": "Deny",
+                                            "priority": 1400,
+                                            "direction": "Outbound"
+                                        }
+                                    },
+                                    {
+                                        "name": "AllowInternalWebOutBound",
+                                        "properties": {
+                                            "description": "AllowInternalWebOutBound",
+                                            "protocol": "*",
+                                            "sourcePortRange": "*",
+                                            "sourceAddressPrefix": "*",
+                                            "destinationAddressPrefix": "*",
+                                            "access": "Allow",
+                                            "priority": 1500,
+                                            "direction": "Outbound",
+                                            "destinationPortRanges": [
+                                                "443",
+                                                "80"
+                                            ]
+                                        }
+                                    }
+                                ]
+                            }
+                        },
+                        {
+                            "name": "firewall-untrusted-dev-nsg",
+                            "type": "Microsoft.Network/networkSecurityGroups",
+                            "apiVersion": "2020-11-01",
+                            "location": "[parameters('location')]",
+                            "tags": "[variables('tags')]",
+                            "properties": {
+                                "securityRules": [
+                                    {
+                                        "name": "AllowAzureHealthProbeInBound",
+                                        "properties": {
+                                            "description": "AllowAzureHealthProbeInBound",
+                                            "protocol": "*",
+                                            "sourcePortRange": "*",
+                                            "destinationPortRange": "*",
+                                            "sourceAddressPrefix": "168.63.129.16/32",
+                                            "destinationAddressPrefix": "10.16.2.0/24",
+                                            "access": "Allow",
+                                            "priority": 1000,
+                                            "direction": "Inbound"
+                                        }
+                                    },
+                                    {
+                                        "name": "Allow443And80InBound",
+                                        "properties": {
+                                            "description": "Allow443And80InBound",
+                                            "protocol": "*",
+                                            "sourcePortRange": "*",
+                                            "sourceAddressPrefix": "*",
+                                            "destinationAddressPrefix": "*",
+                                            "access": "Allow",
+                                            "priority": 1100,
+                                            "direction": "Inbound",
+                                            "destinationPortRanges": [
+                                                "443",
+                                                "80"
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "name": "DenyAnyInBound",
+                                        "properties": {
+                                            "description": "DenyAnyInBound",
+                                            "protocol": "*",
+                                            "sourcePortRange": "*",
+                                            "destinationPortRange": "*",
+                                            "sourceAddressPrefix": "*",
+                                            "destinationAddressPrefix": "*",
+                                            "access": "Deny",
+                                            "priority": 1200,
+                                            "direction": "Inbound"
+                                        }
+                                    },
+                                    {
+                                        "name": "DenyToVnetOutbound",
+                                        "properties": {
+                                            "description": "DenyToVnetOutbound",
+                                            "protocol": "*",
+                                            "sourcePortRange": "*",
+                                            "destinationPortRange": "*",
+                                            "sourceAddressPrefix": "*",
+                                            "destinationAddressPrefix": "10.16.0.0/16",
+                                            "access": "Deny",
+                                            "priority": 1000,
+                                            "direction": "Outbound"
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    ],
+                    "outputs": {}
+                }
+            }
+        }
+    ],
+    "outputs": {
+        "output1": {
+            "type": "string",
+            "value": "branch nsg_rework, nsg subscription deployment"
+        }
+    }
+}

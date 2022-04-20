@@ -10,6 +10,15 @@
         },
         "virtualNetworkName": {
             "value": "sfc01-wu3-dev-vnet__"
+        },
+        "firewallResourceGroupName": {
+            "value": "sfc-firewall-dev-rg__"
+        },
+        "gitBranch": {
+            "value": "main_rework"
+        },
+        "nsgDeploymentTemplateName": {
+            "value": "nsg.json"
         }
     }
 }
