@@ -64,7 +64,7 @@
             "condition": true,
             "location": "[parameters('location')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Resources/deployments', 'linkedDeploymentNSG')]"
+            //    "[resourceId('Microsoft.Resources/deployments', 'linkedDeploymentNSG')]"
             ],
             "tags": "[variables('tags')]",
             "properties": {
@@ -118,5 +118,10 @@
             }
         }
     ],
-    "outputs": {}
+    "outputs": {
+        "nsgID": {
+            "type": "string",
+            "value": "[resourceId('Microsoft.Resources/deployments', 'linkedDeploymentNSG')]"
+        }
+    }
 }
