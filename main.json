@@ -63,7 +63,9 @@
             "apiVersion": "2020-11-01",
             "condition": true,
             "location": "[parameters('location')]",
-            "dependsOn": ["[resourceId('Microsoft.Resources/deployments', 'linkedDeploymentNSG')]"],
+            "dependsOn": [
+                "[resourceId('Microsoft.Resources/deployments', 'linkedDeploymentNSG')]"
+            ],
             "tags": "[variables('tags')]",
             "properties": {
                 "addressSpace": {
