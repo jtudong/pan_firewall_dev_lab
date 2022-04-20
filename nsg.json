@@ -52,8 +52,7 @@
                             "sourcePortRanges": [],
                             "destinationPortRanges": [],
                             "sourceAddressPrefixes": [
-                                "172.16.252.0/22",
-                                "10.123.23.57/32"
+                                "172.16.252.0/22"
                             ],
                             "destinationAddressPrefixes": []
                         }
