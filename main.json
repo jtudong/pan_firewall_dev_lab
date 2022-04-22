@@ -92,7 +92,6 @@
                             },
                             "routeTable": {
                                 "id": "[reference('linkedDeploymentRT').outputs.managementRT.value]"
-                                //"id": "/subscriptions/6081cfb9-7cb9-4b84-8be8-337fdcac59f6/resourceGroups/sfc-firewall-dev-rg__/providers/Microsoft.Network/routeTables/firewall-management-rt"
                             }
                         }
                     },
@@ -102,10 +101,10 @@
                             "addressPrefix": "10.16.2.0/24",
                             "networkSecurityGroup": {
                                 "id": "[reference('linkedDeploymentNSG').outputs.untrustedNSG.value]"
-                            }/* ,
+                            },
                             "routeTable": {
                                 "id": "[reference('linkedDeploymentNSG').outputs.untrustedRT.value]"
-                            } */
+                            }
                         }
                     },
                     {
@@ -114,10 +113,10 @@
                             "addressPrefix": "10.16.3.0/24",
                             "networkSecurityGroup": {
                                 "id": "[reference('linkedDeploymentNSG').outputs.trustedNSG.value]"
-                            }/* ,
+                            },
                             "routeTable": {
                                 "id": "[reference('linkedDeploymentNSG').outputs.trustedRT.value]"
-                            } */
+                            }
                         }
                     }
                 ]
