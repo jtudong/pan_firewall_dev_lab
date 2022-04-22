@@ -103,7 +103,7 @@
                                 "id": "[reference('linkedDeploymentNSG').outputs.untrustedNSG.value]"
                             },
                             "routeTable": {
-                                "id": "[reference('linkedDeploymentNSG').outputs.untrustedRT.value]"
+                                "id": "[reference('linkedDeploymentRT').outputs.untrustedRT.value]"
                             }
                         }
                     },
@@ -115,7 +115,7 @@
                                 "id": "[reference('linkedDeploymentNSG').outputs.trustedNSG.value]"
                             },
                             "routeTable": {
-                                "id": "[reference('linkedDeploymentNSG').outputs.trustedRT.value]"
+                                "id": "[reference('linkedDeploymentRT').outputs.trustedRT.value]"
                             }
                         }
                     }
