@@ -19,6 +19,9 @@
         },
         "nsgDeploymentTemplateName": {
             "value": "nsg.json"
+        },
+        "routeTableDeploymentTemplateName": {
+            "value": "routetable.json"
         }
     }
 }

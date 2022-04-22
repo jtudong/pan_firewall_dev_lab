@@ -43,6 +43,12 @@
             "metadata": {
                 "description": "The name of the NSG template"
             }
+        },
+        "routeTableDeploymentTemplateName": {
+            "type": "string",
+            "metadata": {
+                "description": "The name of the Route Table template"
+            }
         }
     },
     "functions": [],
@@ -55,6 +61,7 @@
         },
         "templateBaseUrl": "[concat('https://raw.githubusercontent.com/jtudong/pan_firewall_dev_lab/',parameters('gitBranch'),'/')]",
         "nsgTemplateUrl": "[uri(variables('templateBaseUrl'),parameters('nsgDeploymentTemplateName'))]"
+        "routeTableTemplateUrl": "[uri(variables('templateBaseUrl'),parameters('routeTableDeploymentTemplateName'))]"
     },
     "resources": [
         {
@@ -115,6 +122,28 @@
                 "mode": "Incremental",
                 "templateLink": {
                     "uri": "[variables('nsgTemplateUrl')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "location": {
+                        "value": "[parameters('location')]"
+                    },
+                    "environment": {
+                        "value": "[parameters('environment')]"
+                    }
+                }
+            }
+        },
+        {
+            "name": "linkedDeploymentRouteTable",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2021-04-01",
+            "condition": true,
+            "resourceGroup": "[parameters('firewallResourceGroupName')]",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('routeTableTemplateUrl')]",
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
