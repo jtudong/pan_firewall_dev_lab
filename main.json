@@ -89,10 +89,11 @@
                             "addressPrefix": "10.16.4.0/24",
                             "networkSecurityGroup": {
                                 "id": "[reference('linkedDeploymentNSG').outputs.managementNSG.value]"
-                            }/* ,
+                            },
                             "routeTable": {
-                                "id": "[reference('linkedDeploymentRT').outputs.managementRT.value]"
-                            } */
+                                //"id": "[reference('linkedDeploymentRT').outputs.managementRT.value]"
+                                "id": "/subscriptions/6081cfb9-7cb9-4b84-8be8-337fdcac59f6/resourceGroups/sfc-firewall-dev-rg__/providers/Microsoft.Network/routeTables/firewall-management-rt"
+                            }
                         }
                     },
                     {
