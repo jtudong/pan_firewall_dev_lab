@@ -60,7 +60,7 @@
             "Application": "network"
         },
         "templateBaseUrl": "[concat('https://raw.githubusercontent.com/jtudong/pan_firewall_dev_lab/',parameters('gitBranch'),'/')]",
-        "nsgTemplateUrl": "[uri(variables('templateBaseUrl'),parameters('nsgDeploymentTemplateName'))]"
+        "nsgTemplateUrl": "[uri(variables('templateBaseUrl'),parameters('nsgDeploymentTemplateName'))]",
         "routeTableTemplateUrl": "[uri(variables('templateBaseUrl'),parameters('routeTableDeploymentTemplateName'))]"
     },
     "resources": [
