@@ -72,7 +72,8 @@
             "location": "[parameters('location')]",
             "dependsOn": [
                 // deployment is in a different resource group so it must be added to the resourceID string
-                "[resourceId(parameters('firewallResourceGroupName'),'Microsoft.Resources/deployments', 'linkedDeploymentNSG')]"
+                "[resourceId(parameters('firewallResourceGroupName'),'Microsoft.Resources/deployments', 'linkedDeploymentNSG')]",
+                "[resourceId(parameters('firewallResourceGroupName'),'Microsoft.Resources/deployments', 'linkedDeploymentRT')]"
             ],
             "tags": "[variables('tags')]",
             "properties": {
@@ -88,6 +89,9 @@
                             "addressPrefix": "10.16.4.0/24",
                             "networkSecurityGroup": {
                                 "id": "[reference('linkedDeploymentNSG').outputs.managementNSG.value]"
+                            },
+                            "routeTable": {
+                                "id": "[reference('linkedDeploymentRT').outputs.managementRT.value]"
                             }
                         }
                     },
@@ -97,6 +101,9 @@
                             "addressPrefix": "10.16.2.0/24",
                             "networkSecurityGroup": {
                                 "id": "[reference('linkedDeploymentNSG').outputs.untrustedNSG.value]"
+                            },
+                            "routeTable": {
+                                "id": "[reference('linkedDeploymentNSG').outputs.untrustedRT.value]"
                             }
                         }
                     },
@@ -106,6 +113,9 @@
                             "addressPrefix": "10.16.3.0/24",
                             "networkSecurityGroup": {
                                 "id": "[reference('linkedDeploymentNSG').outputs.trustedNSG.value]"
+                            },
+                            "routeTable": {
+                                "id": "[reference('linkedDeploymentNSG').outputs.trustedRT.value]"
                             }
                         }
                     }
@@ -135,7 +145,7 @@
             }
         },
         {
-            "name": "linkedDeploymentRouteTable",
+            "name": "linkedDeploymentRT",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2021-04-01",
             "condition": true,
