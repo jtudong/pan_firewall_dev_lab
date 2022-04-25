@@ -168,13 +168,5 @@
         }
     ],
     "outputs": {
-        "nsgID": {
-            "type": "string",
-            "value": "[resourceId('Microsoft.Resources/deployments', 'linkedDeploymentNSG')]"
-        },
-        "rtID": {
-            "type": "string",
-            "value": "[resourceId('Microsoft.Resources/deployments','linkedDeploymentRT')]"
-        }
     }
 }
