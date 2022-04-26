@@ -4,7 +4,9 @@ cd /mnt/c/Users/jtudong/code/pan_firewall_dev_lab
 az group delete -n sfc-network-dev-rg__ --yes
 az group delete -n sfc-firewall-dev-rg__ --yes
 
-az group delete -n sfc-firewall-dev-rg__ --yes&&az group delete -n sfc-network-dev-rg__ --yes
+az group delete -n sfc-network-dev-rg__ --yes&&az group delete -n sfc-firewall-dev-rg__ --yes
 
 az deployment sub validate -l westus3 -f main.json -p main.parameters.json
 az deployment sub create -c -l westus3 -f main.json -p main.parameters.json
+
+az deployment group validate -l westus3 -g sfc-network-dev-rg__ -f nsg.json
