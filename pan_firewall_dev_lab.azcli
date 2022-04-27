@@ -9,4 +9,4 @@ az group delete -n sfc-network-dev-rg__ --yes&&az group delete -n sfc-firewall-d
 az deployment sub validate -l westus3 -f main.json -p main.parameters.json
 az deployment sub create -c -l westus3 -f main.json -p main.parameters.json
 
-az deployment group validate -l westus3 -g sfc-network-dev-rg__ -f nsg.json
+az deployment group validate -l westus3 -g sfc-firewall-dev-rg__ -f nsg.json
