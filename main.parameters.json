@@ -9,10 +9,10 @@
             "value": "dev"
         },
         "virtualNetworkName": {
-            "value": "sfc01-wu3-dev-vnet__"
+            "value": "sfc01-wu3-dev-vnet"
         },
         "firewallResourceGroupName": {
-            "value": "sfc-firewall-dev-rg__"
+            "value": "sfc-firewall-dev-rg_"
         },
         "gitBranch": {
             "value": "master"

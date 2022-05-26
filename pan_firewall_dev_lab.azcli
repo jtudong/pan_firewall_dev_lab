@@ -1,12 +1,11 @@
 az account set -s 'vs_sandbox'
 cd /mnt/c/Users/jtudong/code/pan_firewall_dev_lab
 
-az group delete -n sfc-network-dev-rg__ --yes
-az group delete -n sfc-firewall-dev-rg__ --yes
+az network vnet subnet update -g sfc-network-dev-rg_ -n dev-firewalltest --vnet-name sfc01-wu3-dev-vnet --remove networkSecurityGroup --nsg dev-firewalltest-nsg
+az group delete -n sfc-firewalltest-dev-rg_ --yes&&az group delete -n sfc-network-dev-rg_ --yes
 
-az group delete -n sfc-network-dev-rg__ --yes&&az group delete -n sfc-firewall-dev-rg__ --yes
+az group create -l westus3 -n sfc-network-dev-rg_
+az group create -l westus3 -n sfc-firewalltest-dev-rg_
 
-az deployment sub validate -l westus3 -f main.json -p main.parameters.json
-az deployment sub create -c -l westus3 -f main.json -p main.parameters.json
-
-az deployment group validate -l westus3 -g sfc-firewall-dev-rg__ -f nsg.json
+az deployment group validate -g sfc-firewalltest-dev-rg_ -f main.json -p main.parameters.json
+az deployment group create -c -g sfc-firewalltest-dev-rg_ -f main.json -p main.parameters.json adminPassword='$password'
