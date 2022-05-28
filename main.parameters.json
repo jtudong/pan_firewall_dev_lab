@@ -22,6 +22,9 @@
         },
         "routeTableDeploymentTemplateName": {
             "value": "routetable.json"
+        },
+        "vnetResourceGroupName": {
+            "value": "sfc-network-dev-rg_"
         }
     }
 }
