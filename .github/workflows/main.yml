@@ -6,7 +6,8 @@ on:
   push:
     branches:
       - master
-      - '*rework'
+      - '*devel'
+      - firewall
   workflow_dispatch:
 
 env:
