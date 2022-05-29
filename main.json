@@ -70,70 +70,17 @@
         "routeTableTemplateUrl": "[uri(variables('templateBaseUrl'),parameters('routeTableDeploymentTemplateName'))]"
     },
     "resources": [
-/*         {
-            "name": "[parameters('virtualNetworkName')]",
-            "type": "Microsoft.Network/virtualNetworks",
-            "apiVersion": "2020-11-01",
-            "condition": true,
-            "location": "[parameters('location')]",
-            "dependsOn": [
-                // deployment is in a different resource group so it must be added to the resourceID string
-                "[resourceId(parameters('firewallResourceGroupName'),'Microsoft.Resources/deployments', 'linkedDeploymentNSG')]",
-                "[resourceId(parameters('firewallResourceGroupName'),'Microsoft.Resources/deployments', 'linkedDeploymentRT')]"
-            ],
-            "tags": "[variables('tags')]",
-            "properties": {
-                "addressSpace": {
-                    "addressPrefixes": [
-                        "10.16.0.0/16"
-                    ]
-                },
-                "subnets": [
-                    {
-                        "name": "firewall-management",
-                        "properties": {
-                            "addressPrefix": "10.16.4.0/24",
-                            "networkSecurityGroup": {
-                                "id": "[reference('linkedDeploymentNSG').outputs.managementNSG.value]"
-                            },
-                            "routeTable": {
-                                "id": "[reference('linkedDeploymentRT').outputs.managementRT.value]"
-                            }
-                        }
-                    },
-                    {
-                        "name": "firewall-untrusted",
-                        "properties": {
-                            "addressPrefix": "10.16.2.0/24",
-                            "networkSecurityGroup": {
-                                "id": "[reference('linkedDeploymentNSG').outputs.untrustedNSG.value]"
-                            },
-                            "routeTable": {
-                                "id": "[reference('linkedDeploymentRT').outputs.untrustedRT.value]"
-                            }
-                        }
-                    },
-                    {
-                        "name": "firewall-trusted",
-                        "properties": {
-                            "addressPrefix": "10.16.3.0/24",
-                            "networkSecurityGroup": {
-                                "id": "[reference('linkedDeploymentNSG').outputs.trustedNSG.value]"
-                            },
-                            "routeTable": {
-                                "id": "[reference('linkedDeploymentRT').outputs.trustedRT.value]"
-                            }
-                        }
-                    }
-                ]
-            }
-        }, */
         {
             "name": "nestedDeploymentVnet",
             "type": "Microsoft.Resources/deployments",
             "condition": true,
             "apiVersion": "2021-04-01",
             "resourceGroup": "[parameters('vnetResourceGroupName')]",
+            "dependsOn": [
+                // deployment is in a different resource group so it must be added to the resourceID string
+                "[resourceId(parameters('firewallResourceGroupName'),'Microsoft.Resources/deployments', 'linkedDeploymentNSG')]",
+                "[resourceId(parameters('firewallResourceGroupName'),'Microsoft.Resources/deployments', 'linkedDeploymentRT')]"
+            ],
             "properties": {
                 "mode": "Incremental",
                 "template": {
@@ -158,19 +105,37 @@
                                     {
                                         "name": "firewall-management",
                                         "properties": {
-                                            "addressPrefix": "10.16.4.0/24"
+                                            "addressPrefix": "10.16.4.0/24",
+                                            "networkSecurityGroup": {
+                                                "id": "[reference('linkedDeploymentNSG').outputs.managementNSG.value]"
+                                            },
+                                            "routeTable": {
+                                                "id": "[reference('linkedDeploymentRT').outputs.managementRT.value]"
+                                            }
                                         }
                                     },
                                     {
                                         "name": "firewall-untrusted",
                                         "properties": {
-                                            "addressPrefix": "10.16.2.0/24"
+                                            "addressPrefix": "10.16.2.0/24",
+                                            "networkSecurityGroup": {
+                                                "id": "[reference('linkedDeploymentNSG').outputs.untrustedNSG.value]"
+                                            },
+                                            "routeTable": {
+                                                "id": "[reference('linkedDeploymentRT').outputs.untrustedRT.value]"
+                                            }
                                         }
                                     },
                                     {
                                         "name": "firewall-trusted",
                                         "properties": {
-                                            "addressPrefix": "10.16.3.0/24"
+                                            "addressPrefix": "10.16.3.0/24",
+                                            "networkSecurityGroup": {
+                                                "id": "[reference('linkedDeploymentNSG').outputs.trustedNSG.value]"
+                                            },
+                                            "routeTable": {
+                                                "id": "[reference('linkedDeploymentRT').outputs.trustedRT.value]"
+                                            }
                                         }
                                     }
                                 ]
@@ -185,7 +150,7 @@
             "name": "linkedDeploymentNSG",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2021-04-01",
-            "condition": false,
+            "condition": true,
             "resourceGroup": "[parameters('firewallResourceGroupName')]",
             "properties": {
                 "mode": "Incremental",
@@ -207,7 +172,7 @@
             "name": "linkedDeploymentRT",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2021-04-01",
-            "condition": false,
+            "condition": true,
             "resourceGroup": "[parameters('firewallResourceGroupName')]",
             "properties": {
                 "mode": "Incremental",
