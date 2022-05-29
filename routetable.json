@@ -62,7 +62,7 @@
                         "name": "untrust-forced-firewall",
                         "properties": {
                             "provisioningState": "Succeeded",
-                            "addressPrefix": "10.117.2.0/24",
+                            "addressPrefix": "10.116.2.0/24",
                             "nextHopType": "VirtualAppliance",
                             "nextHopIpAddress": "10.116.3.4"
                         }
