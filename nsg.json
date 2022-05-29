@@ -27,11 +27,14 @@
             "Team": "networking",
             "Environment": "[parameters('environment')]",
             "Application": "network"
-        }
+        },
+        "managementNsgName": "[concat('firewall-management-',parameters('environment'),'-nsg')]",
+        "trustedNsgName": "[concat('firewall-trusted-',parameters('environment'),'-nsg')]",
+        "untrustedNsgName": "[concat('firewall-untrusted-',parameters('environment'),'-nsg')]"
     },
     "resources": [
         {
-            "name": "firewall-management-dev-nsg",
+            "name": "[variables('managementNsgName')]",
             "type": "Microsoft.Network/networkSecurityGroups",
             "apiVersion": "2020-11-01",
             "location": "[parameters('location')]",
@@ -195,7 +198,7 @@
             }
         },
         {
-            "name": "firewall-trusted-dev-nsg",
+            "name": "[variables('trustedNsgName')]",
             "type": "Microsoft.Network/networkSecurityGroups",
             "apiVersion": "2020-11-01",
             "location": "[parameters('location')]",
@@ -394,7 +397,7 @@
             }
         },
         {
-            "name": "firewall-untrusted-dev-nsg",
+            "name": "[variables('untrustedNsgName')]",
             "type": "Microsoft.Network/networkSecurityGroups",
             "apiVersion": "2020-11-01",
             "location": "[parameters('location')]",
