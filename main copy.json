@@ -49,12 +49,6 @@
             "metadata": {
                 "description": "The name of the Route Table template"
             }
-        },
-        "vnetResourceGroupName": {
-            "type": "string",
-            "metadata": {
-                "description": "The resource group for the vnet"
-            }
         }
     },
     "functions": [],
@@ -71,79 +65,61 @@
     },
     "resources": [
         {
-            "name": "nestedDeploymentVnet",
-            "type": "Microsoft.Resources/deployments",
+            "name": "[parameters('virtualNetworkName')]",
+            "type": "Microsoft.Network/virtualNetworks",
+            "apiVersion": "2020-11-01",
             "condition": true,
-            "apiVersion": "2021-04-01",
-            "resourceGroup": "[parameters('vnetResourceGroupName')]",
+            "location": "[parameters('location')]",
             "dependsOn": [
                 // deployment is in a different resource group so it must be added to the resourceID string
                 "[resourceId(parameters('firewallResourceGroupName'),'Microsoft.Resources/deployments', 'linkedDeploymentNSG')]",
                 "[resourceId(parameters('firewallResourceGroupName'),'Microsoft.Resources/deployments', 'linkedDeploymentRT')]"
             ],
+            "tags": "[variables('tags')]",
             "properties": {
-                "mode": "Incremental",
-                "template": {
-                    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
-                    "contentVersion": "1.0.0.0",
-                    "variables": {},
-                    "resources": [
-                        {
-                            "name": "[parameters('virtualNetworkName')]",
-                            "type": "Microsoft.Network/virtualNetworks",
-                            "apiVersion": "2020-11-01",
-                            "location": "[parameters('location')]",
-                            "dependsOn": [],
-                            "tags": "[variables('tags')]",
-                            "properties": {
-                                "addressSpace": {
-                                    "addressPrefixes": [
-                                        "10.16.0.0/16"
-                                    ]
-                                },
-                                "subnets": [
-                                    {
-                                        "name": "firewall-management",
-                                        "properties": {
-                                            "addressPrefix": "10.16.4.0/24",
-                                            "networkSecurityGroup": {
-                                                "id": "[reference('linkedDeploymentNSG').outputs.managementNSG.value]"
-                                            },
-                                            "routeTable": {
-                                                "id": "[reference('linkedDeploymentRT').outputs.managementRT.value]"
-                                            }
-                                        }
-                                    },
-                                    {
-                                        "name": "firewall-untrusted",
-                                        "properties": {
-                                            "addressPrefix": "10.16.2.0/24",
-                                            "networkSecurityGroup": {
-                                                "id": "[reference('linkedDeploymentNSG').outputs.untrustedNSG.value]"
-                                            },
-                                            "routeTable": {
-                                                "id": "[reference('linkedDeploymentRT').outputs.untrustedRT.value]"
-                                            }
-                                        }
-                                    },
-                                    {
-                                        "name": "firewall-trusted",
-                                        "properties": {
-                                            "addressPrefix": "10.16.3.0/24",
-                                            "networkSecurityGroup": {
-                                                "id": "[reference('linkedDeploymentNSG').outputs.trustedNSG.value]"
-                                            },
-                                            "routeTable": {
-                                                "id": "[reference('linkedDeploymentRT').outputs.trustedRT.value]"
-                                            }
-                                        }
-                                    }
-                                ]
+                "addressSpace": {
+                    "addressPrefixes": [
+                        "10.16.0.0/16"
+                    ]
+                },
+                "subnets": [
+                    {
+                        "name": "firewall-management",
+                        "properties": {
+                            "addressPrefix": "10.16.4.0/24",
+                            "networkSecurityGroup": {
+                                "id": "[reference('linkedDeploymentNSG').outputs.managementNSG.value]"
+                            },
+                            "routeTable": {
+                                "id": "[reference('linkedDeploymentRT').outputs.managementRT.value]"
                             }
                         }
-                    ],
-                    "outputs": {}
-                }
+                    },
+                    {
+                        "name": "firewall-untrusted",
+                        "properties": {
+                            "addressPrefix": "10.16.2.0/24",
+                            "networkSecurityGroup": {
+                                "id": "[reference('linkedDeploymentNSG').outputs.untrustedNSG.value]"
+                            },
+                            "routeTable": {
+                                "id": "[reference('linkedDeploymentRT').outputs.untrustedRT.value]"
+                            }
+                        }
+                    },
+                    {
+                        "name": "firewall-trusted",
+                        "properties": {
+                            "addressPrefix": "10.16.3.0/24",
+                            "networkSecurityGroup": {
+                                "id": "[reference('linkedDeploymentNSG').outputs.trustedNSG.value]"
+                            },
+                            "routeTable": {
+                                "id": "[reference('linkedDeploymentRT').outputs.trustedRT.value]"
+                            }
+                        }
+                    }
+                ]
             }
         },
         {

@@ -9,19 +9,22 @@
             "value": "dev"
         },
         "virtualNetworkName": {
-            "value": "sfc01-wu3-dev-vnet__"
+            "value": "sfc01-wu3-dev-vnet"
         },
         "firewallResourceGroupName": {
-            "value": "sfc-firewall-dev-rg__"
+            "value": "sfc-firewall-dev-rg_"
         },
         "gitBranch": {
-            "value": "master"
+            "value": "firewall"
         },
         "nsgDeploymentTemplateName": {
             "value": "nsg.json"
         },
         "routeTableDeploymentTemplateName": {
             "value": "routetable.json"
+        },
+        "vnetResourceGroupName": {
+            "value": "sfc-network-dev-rg_"
         }
     }
 }
