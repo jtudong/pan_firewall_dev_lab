@@ -27,11 +27,14 @@
             "Team": "networking",
             "Environment": "[parameters('environment')]",
             "Application": "network"
-        }
+        },
+        "managementRtName": "[concat('firewall-management-',parameters('environment'),'-rt')]",
+        "trustedRtName": "[concat('firewall-trusted-',parameters('environment'),'-rt')]",
+        "untrustedRtName": "[concat('firewall-untrusted-',parameters('environment'),'-rt')]"
     },
     "resources": [
         {
-            "name": "firewall-management-rt",
+            "name": "[variables('managementRtName')]",
             "type": "Microsoft.Network/routeTables",
             "apiVersion": "2020-11-01",
             "location": "[parameters('location')]",
@@ -42,7 +45,7 @@
             }
         },
         {
-            "name": "firewall-trusted-rt",
+            "name": "[variables('trustedRtName')]",
             "type": "Microsoft.Network/routeTables",
             "apiVersion": "2020-11-01",
             "location": "[parameters('location')]",
@@ -72,7 +75,7 @@
             }
         },
         {
-            "name": "firewall-untrusted-rt",
+            "name": "[variables('untrustedRtName')]",
             "type": "Microsoft.Network/routeTables",
             "apiVersion": "2020-11-01",
             "location": "[parameters('location')]",
@@ -86,15 +89,15 @@
     "outputs": {
         "managementRT": {
             "type": "string",
-            "value": "[resourceId('Microsoft.Network/routeTables','firewall-management-rt')]"
+            "value": "[resourceId('Microsoft.Network/routeTables',variables('managementRtName'))]"
         },
         "trustedRT": {
             "type": "string",
-            "value": "[resourceId('Microsoft.Network/routeTables','firewall-trusted-rt')]"
+            "value": "[resourceId('Microsoft.Network/routeTables',variables('trustedRtName'))]"
         },
         "untrustedRT": {
             "type": "string",
-            "value": "[resourceId('Microsoft.Network/routeTables','firewall-untrusted-rt')]"
+            "value": "[resourceId('Microsoft.Network/routeTables',variables('untrustedRtName'))]"
         }
     }
 }
