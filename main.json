@@ -61,7 +61,7 @@
             "metadata": {
                 "description": "The name prefix for the storage account"
             },
-            "minLength": 3,
+            "minLength": 2,
             "maxLength": 9
         }
     },
