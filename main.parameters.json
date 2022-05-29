@@ -25,6 +25,9 @@
         },
         "vnetResourceGroupName": {
             "value": "sfc-network-dev-rg_"
+        },
+        "storageAccountPrefix": {
+            "value": "sfcfw"
         }
     }
 }

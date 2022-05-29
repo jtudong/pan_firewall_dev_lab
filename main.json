@@ -55,6 +55,14 @@
             "metadata": {
                 "description": "The resource group for the vnet"
             }
+        },
+        "storageAccountPrefix": {
+            "type": "string",
+            "metadata": {
+                "description": "The name prefix for the storage account"
+            },
+            "minLength": 3,
+            "maxLength": 9
         }
     },
     "functions": [],
@@ -67,9 +75,11 @@
         },
         "templateBaseUrl": "[concat('https://raw.githubusercontent.com/jtudong/pan_firewall_dev_lab/',parameters('gitBranch'),'/')]",
         "nsgTemplateUrl": "[uri(variables('templateBaseUrl'),parameters('nsgDeploymentTemplateName'))]",
-        "routeTableTemplateUrl": "[uri(variables('templateBaseUrl'),parameters('routeTableDeploymentTemplateName'))]"
+        "routeTableTemplateUrl": "[uri(variables('templateBaseUrl'),parameters('routeTableDeploymentTemplateName'))]",
+        "storageAccountName": "[concat('sfc',parameters('storageAccountPrefix'),uniqueString(resourceGroup().id),'sa')]"
     },
     "resources": [
+        // Create the Vnet
         {
             "name": "nestedDeploymentVnet",
             "type": "Microsoft.Resources/deployments",
@@ -146,6 +156,7 @@
                 }
             }
         },
+        // Create the NSG
         {
             "name": "linkedDeploymentNSG",
             "type": "Microsoft.Resources/deployments",
@@ -168,6 +179,7 @@
                 }
             }
         },
+        // Create the Route Table
         {
             "name": "linkedDeploymentRT",
             "type": "Microsoft.Resources/deployments",
@@ -188,6 +200,19 @@
                         "value": "[parameters('environment')]"
                     }
                 }
+            }
+        },
+        // create the storage account
+        {
+            "name": "[variables('storageAccountName')]",
+            "type": "Microsoft.Storage/storageAccounts",
+            "apiVersion": "2021-04-01",
+            "tags": "[variables('tags')]",
+            "location": "[parameters('location')]",
+            "kind": "StorageV2",
+            "sku": {
+                "name": "Standard_LRS",
+                "tier": "Standard"
             }
         }
     ],
