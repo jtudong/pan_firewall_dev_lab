@@ -1,10 +1,11 @@
 az account set -s 'vs_sandbox'
 cd /mnt/c/Users/jtudong/code/pan_firewall_dev_lab
 
-az network vnet subnet delete -g sfc-network-dev-rg_ -n firewall-management --vnet-name sfc01-wu3-dev-vnet
-^-management^-untrusted
-^-untrusted^-trusted
-az group delete -n sfc-firewall-dev-rg_ --yes&&az group delete -n sfc-network-dev-rg_ --yes
+az network vnet subnet delete -g sfc-network-dev-rg_ -n firewall-management --vnet-name sfc01-wu3-dev-vnet;\
+az network vnet subnet delete -g sfc-network-dev-rg_ -n firewall-untrusted --vnet-name sfc01-wu3-dev-vnet;\
+az network vnet subnet delete -g sfc-network-dev-rg_ -n firewall-trusted --vnet-name sfc01-wu3-dev-vnet;\
+echo "delete sfc-firewall-dev-rg_";\
+az group delete -n sfc-firewall-dev-rg_ --yes&&echo "deletesfc-network-dev-rg_"; az group delete -n sfc-network-dev-rg_ --yes
 
 az group create -l westus3 -n sfc-network-dev-rg_
 az group create -l westus3 -n sfc-firewall-dev-rg_

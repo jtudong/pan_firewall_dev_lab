@@ -89,15 +89,15 @@
     "outputs": {
         "managementRT": {
             "type": "string",
-            "value": "[resourceId('Microsoft.Network/routeTables','firewall-management-rt')]"
+            "value": "[resourceId('Microsoft.Network/routeTables',variables('managementRtName'))]"
         },
         "trustedRT": {
             "type": "string",
-            "value": "[resourceId('Microsoft.Network/routeTables','firewall-trusted-rt')]"
+            "value": "[resourceId('Microsoft.Network/routeTables',variables('trustedRtName'))]"
         },
         "untrustedRT": {
             "type": "string",
-            "value": "[resourceId('Microsoft.Network/routeTables','firewall-untrusted-rt')]"
+            "value": "[resourceId('Microsoft.Network/routeTables',variables('untrustedRtName'))]"
         }
     }
 }
