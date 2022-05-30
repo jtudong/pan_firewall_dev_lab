@@ -234,6 +234,29 @@
             "sku": {
                 "name": "Basic"
             }
+        },
+        {
+            "name": "[concat(parameters('vmName'),'-01-nic')]",
+            "type": "Microsoft.Network/networkInterfaces",
+            "apiVersion": "2020-11-01",
+            "location": "[parameters('location')]",
+            "tags": "[variables('tags')]",
+            "dependsOn": [
+                "[resourceId(parameters('vnetResourceGroupName'),'Microsoft.Resources/deployments', 'nestedDeploymentVnet')]"
+            ],
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "management",
+                        "properties": {
+                            "privateIPAllocationMethod": "Dynamic",
+                            "subnet": {
+                                "id": "[resourceId(parameters('vnetResourceGroupName'),'Microsoft.Network/virtualNetworks/subnets',parameters('virtualNetworkName'),'firewall-management')]"
+                            }
+                        }
+                    }
+                ]
+            }
         }
     ],
     "outputs": {
