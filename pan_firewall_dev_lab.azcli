@@ -5,7 +5,7 @@ az network vnet subnet delete -g sfc-network-dev-rg_ -n firewall-management --vn
 az network vnet subnet delete -g sfc-network-dev-rg_ -n firewall-untrusted --vnet-name sfc01-wu3-dev-vnet;\
 az network vnet subnet delete -g sfc-network-dev-rg_ -n firewall-trusted --vnet-name sfc01-wu3-dev-vnet;\
 echo "delete sfc-firewall-dev-rg_";\
-az group delete -n sfc-firewall-dev-rg_ --yes&&echo "deletesfc-network-dev-rg_"; az group delete -n sfc-network-dev-rg_ --yes
+az group delete -n sfc-firewall-dev-rg_ --yes&&echo "delete sfc-network-dev-rg_"; az group delete -n sfc-network-dev-rg_ --yes
 
 az group create -l westus3 -n sfc-network-dev-rg_
 az group create -l westus3 -n sfc-firewall-dev-rg_

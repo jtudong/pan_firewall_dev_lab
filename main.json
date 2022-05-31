@@ -63,6 +63,12 @@
             },
             "minLength": 2,
             "maxLength": 9
+        },
+        "vmName": {
+            "type": "string",
+            "metadata": {
+                "description": "The name of the firewall VM"
+            }
         }
     },
     "functions": [],
@@ -76,7 +82,8 @@
         "templateBaseUrl": "[concat('https://raw.githubusercontent.com/jtudong/pan_firewall_dev_lab/',parameters('gitBranch'),'/')]",
         "nsgTemplateUrl": "[uri(variables('templateBaseUrl'),parameters('nsgDeploymentTemplateName'))]",
         "routeTableTemplateUrl": "[uri(variables('templateBaseUrl'),parameters('routeTableDeploymentTemplateName'))]",
-        "storageAccountName": "[concat('sfc',parameters('storageAccountPrefix'),uniqueString(resourceGroup().id),'sa')]"
+        "storageAccountName": "[concat('sfc',parameters('storageAccountPrefix'),uniqueString(resourceGroup().id),'sa')]",
+        "namePublicIpAddress": "[concat(parameters('vmName'),'-pip')]"
     },
     "resources": [
         // Create the Vnet
@@ -213,6 +220,91 @@
             "sku": {
                 "name": "Standard_LRS",
                 "tier": "Standard"
+            }
+        },
+        {
+            "name": "[variables('namePublicIpAddress')]",
+            "type": "Microsoft.Network/publicIPAddresses",
+            "apiVersion": "2020-11-01",
+            "location": "[parameters('location')]",
+            "tags": "[variables('tags')]",
+            "properties": {
+                "publicIPAllocationMethod": "Dynamic"
+            },
+            "sku": {
+                "name": "Basic"
+            }
+        },
+        {
+            "name": "[concat(parameters('vmName'),'-01-nic')]",
+            "type": "Microsoft.Network/networkInterfaces",
+            "apiVersion": "2020-11-01",
+            "location": "[parameters('location')]",
+            "tags": "[variables('tags')]",
+            "dependsOn": [
+                "[resourceId(parameters('vnetResourceGroupName'),'Microsoft.Resources/deployments', 'nestedDeploymentVnet')]"
+            ],
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "management",
+                        "properties": {
+                            "privateIPAllocationMethod": "Dynamic",
+                            "subnet": {
+                                "id": "[resourceId(parameters('vnetResourceGroupName'),'Microsoft.Network/virtualNetworks/subnets',parameters('virtualNetworkName'),'firewall-management')]"
+                            },
+                            "publicIPAddress": {
+                                "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('namePublicIpAddress'))]"
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "name": "[concat(parameters('vmName'),'-02-nic')]",
+            "type": "Microsoft.Network/networkInterfaces",
+            "apiVersion": "2020-11-01",
+            "location": "[parameters('location')]",
+            "tags": "[variables('tags')]",
+            "dependsOn": [
+                "[resourceId(parameters('vnetResourceGroupName'),'Microsoft.Resources/deployments', 'nestedDeploymentVnet')]"
+            ],
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "untrusted",
+                        "properties": {
+                            "privateIPAllocationMethod": "Dynamic",
+                            "subnet": {
+                                "id": "[resourceId(parameters('vnetResourceGroupName'),'Microsoft.Network/virtualNetworks/subnets',parameters('virtualNetworkName'),'firewall-untrusted')]"
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "name": "[concat(parameters('vmName'),'-03-nic')]",
+            "type": "Microsoft.Network/networkInterfaces",
+            "apiVersion": "2020-11-01",
+            "location": "[parameters('location')]",
+            "tags": "[variables('tags')]",
+            "dependsOn": [
+                "[resourceId(parameters('vnetResourceGroupName'),'Microsoft.Resources/deployments', 'nestedDeploymentVnet')]"
+            ],
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "trusted",
+                        "properties": {
+                            "privateIPAllocationMethod": "Dynamic",
+                            "subnet": {
+                                "id": "[resourceId(parameters('vnetResourceGroupName'),'Microsoft.Network/virtualNetworks/subnets',parameters('virtualNetworkName'),'firewall-trusted')]"
+                            }
+                        }
+                    }
+                ]
             }
         }
     ],

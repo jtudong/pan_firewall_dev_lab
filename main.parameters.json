@@ -28,6 +28,9 @@
         },
         "storageAccountPrefix": {
             "value": "fw"
+        },
+        "vmName": {
+            "value": "aw3lpalnd01"
         }
     }
 }
