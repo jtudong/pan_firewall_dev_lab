@@ -222,6 +222,7 @@
                 "tier": "Standard"
             }
         },
+        // create the management PIP
         {
             "name": "[variables('namePublicIpAddress')]",
             "type": "Microsoft.Network/publicIPAddresses",
@@ -235,6 +236,7 @@
                 "name": "Basic"
             }
         },
+        // create the management NIC
         {
             "name": "[concat(parameters('vmName'),'-01-nic')]",
             "type": "Microsoft.Network/networkInterfaces",
@@ -242,7 +244,8 @@
             "location": "[parameters('location')]",
             "tags": "[variables('tags')]",
             "dependsOn": [
-                "[resourceId(parameters('vnetResourceGroupName'),'Microsoft.Resources/deployments', 'nestedDeploymentVnet')]"
+                "[resourceId(parameters('vnetResourceGroupName'),'Microsoft.Resources/deployments', 'nestedDeploymentVnet')]",
+                "[resourceId('Microsoft.Network/publicIPAddresses', variables('namePublicIpAddress'))]"
             ],
             "properties": {
                 "ipConfigurations": [
@@ -261,6 +264,7 @@
                 ]
             }
         },
+        // create the untrusted NIC
         {
             "name": "[concat(parameters('vmName'),'-02-nic')]",
             "type": "Microsoft.Network/networkInterfaces",
@@ -284,6 +288,7 @@
                 ]
             }
         },
+        // create the trusted NIC
         {
             "name": "[concat(parameters('vmName'),'-03-nic')]",
             "type": "Microsoft.Network/networkInterfaces",
