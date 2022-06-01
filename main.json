@@ -122,14 +122,14 @@
                 "description": "Version number of VM-Series VM in the Azure portal"
             },
             "defaultValue": "latest"
-        },
+        }/* ,
         "zone": {
             "type": "string",
             "defaultValue": "None",
             "metadata": {
                 "description": "Availability Zone for VM-Series"
             }
-        }
+        } */
     },
     "functions": [],
     "variables": {

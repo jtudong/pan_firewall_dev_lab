@@ -57,5 +57,5 @@ jobs:
           subscriptionID: ${{ env.subscription_id}}
           region: ${{ env.location}}
           template: ./main.json
-          parameters: ./main.parameters.json adminPassword=${{ secrets.AZURE_FIREWALL_ADMIN_PASSWORD  }}
+          parameters: ./main.parameters.json adminPassword=${{ secrets.AZURE_FIREWALL_ADMIN_PASSWORD }}
           deploymentName: main
