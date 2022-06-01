@@ -69,6 +69,66 @@
             "metadata": {
                 "description": "The name of the firewall VM"
             }
+        },
+        "vmSize": {
+            "type": "string",
+            "allowedValues": [
+                "Standard_D3_v2",
+                "Standard_D4_v2",
+                "Standard_D5_v2",
+                "Standard_D4_v3",
+                "Standard_DS3_v2",
+                "Standard_DS4_v2",
+                "Standard_DS5_v2",
+                "Standard_D8_v3",
+                "Standard_D16_v3",
+                "Standard_D8s_v3",
+                "Standard_D16s_v3",
+                "Standard_F8s_v2",
+                "Standard_F32s_v2",
+                "Standard_D8_v4",
+                "Standard_D16_v4",
+                "Standard_D8s_v4",
+                "Standard_D16s_v4"
+            ],
+            "metadata": {
+                "description": "Azure VM size for VM-Series"
+            },
+            "defaultValue": "Standard_D3_v2"
+        },
+        "adminUsername": {
+            "type": "string",
+            "metadata": {
+                "description": "Username of the administrator account of VM-Series"
+            },
+            "defaultValue": "localadmin"
+        },
+        "adminPassword": {
+            "type": "securestring",
+            "metadata": {
+                "description": "Password or ssh key for the administrator account of VM-Series."
+            },
+            "defaultValue": null
+        },
+        "imageVersion": {
+            "type": "string",
+            "allowedValues": [
+                "latest",
+                "10.1.0",
+                "10.0.6",
+                "9.1.10"
+            ],
+            "metadata": {
+                "description": "Version number of VM-Series VM in the Azure portal"
+            },
+            "defaultValue": "latest"
+        },
+        "zone": {
+            "type": "string",
+            "defaultValue": "None",
+            "metadata": {
+                "description": "Availability Zone for VM-Series"
+            }
         }
     },
     "functions": [],
@@ -83,7 +143,12 @@
         "nsgTemplateUrl": "[uri(variables('templateBaseUrl'),parameters('nsgDeploymentTemplateName'))]",
         "routeTableTemplateUrl": "[uri(variables('templateBaseUrl'),parameters('routeTableDeploymentTemplateName'))]",
         "storageAccountName": "[concat('sfc',parameters('storageAccountPrefix'),uniqueString(resourceGroup().id),'sa')]",
-        "namePublicIpAddress": "[concat(parameters('vmName'),'-pip')]"
+        "namePublicIpAddress": "[concat(parameters('vmName'),'-pip')]",
+        "imagePublisher": "paloaltonetworks",
+        "imageSku": "byol",
+        "imageOffer": "vmseries-flex",
+        "osDiskName": "[concat(parameters('vmName'),'-osdisk')]"
+        //"zones":  ["[parameters('zone')]"]
     },
     "resources": [
         // Create the Vnet
@@ -311,6 +376,66 @@
                     }
                 ]
             }
+        },
+        // create the firewall
+        {
+            "name": "[parameters('vmName')]",
+            "type": "Microsoft.Compute/virtualMachines",
+            "apiVersion": "2018-06-01",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/networkInterfaces', concat(parameters('vmName'),'-01-nic'))]",
+                "[resourceId('Microsoft.Network/networkInterfaces', concat(parameters('vmName'),'-02-nic'))]",
+                "[resourceId('Microsoft.Network/networkInterfaces', concat(parameters('vmName'),'-03-nic'))]"
+            ],
+            "location": "[parameters('location')]",
+            "plan": {
+                "name": "[variables('imageSku')]",
+                "product": "[variables('imageOffer')]",
+                "publisher": "[variables('imagePublisher')]"
+            },
+            "properties": {
+                // add availability set here
+                "hardwareProfile": {
+                    "vmSize": "[parameters('vmSize')]"
+                },
+                "osProfile": {
+                    "computerName": "[parameters('vmName')]",
+                    "adminUsername": "[parameters('adminUsername')]",
+                    "adminPassword": "[parameters('adminPassword')]"//,
+                    //"linuxConfiguration": "[if(equals(parameters('authenticationType'), 'password'), json('null'), variables('linuxConfiguration'))]",
+                    //"customData": "[if(equals(parameters('bootstrap'), 'no'), json('null'), base64(parameters('customData')))]"
+                },
+                "storageProfile": {
+                    "imageReference": {
+                        "publisher": "[variables('imagePublisher')]",
+                        "offer": "[variables('imageOffer')]",
+                        "sku": "[variables('imageSku')]",
+                        "version": "[parameters('imageVersion')]"
+                    },
+                    "osDisk": {
+                        "name": "[variables('osDiskName')]",
+                        "createOption": "FromImage",
+                        "caching": "ReadWrite"
+                    }
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces',concat(parameters('vmName'),'-01-nic'))]",
+                            "properties": { "primary": true }
+                        },
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces',concat(parameters('vmName'),'-02-nic'))]",
+                            "properties": {"primary": false}
+                        },
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces',concat(parameters('vmName'),'-03-nic'))]",
+                            "properties": {"primary": false}
+                        }
+                    ]
+                }
+            }//,
+            //"zones": "[if(equals(parameters('zone'), 'None'), json('null'), variables('zones'))]"
         }
     ],
     "outputs": {

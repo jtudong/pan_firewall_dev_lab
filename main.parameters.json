@@ -31,6 +31,15 @@
         },
         "vmName": {
             "value": "aw3lpalnd01"
+        },
+        "vmSize":{
+            "value": "Standard_D3_v2"
+        },
+        "adminUsername": {
+            "value": "localadmin"
+        },
+        "imageVersion": {
+            "value": "latest"
         }
     }
 }
