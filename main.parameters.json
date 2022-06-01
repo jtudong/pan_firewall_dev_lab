@@ -39,7 +39,7 @@
             "value": "localadmin"
         },
         "imageVersion": {
-            "value": "latest"
+            "value": "10.1.0"
         },
         "adminPassword": {
             "value": ""
