@@ -10,5 +10,5 @@ az group delete -n sfc-firewall-dev-rg_ --yes&&echo "delete sfc-network-dev-rg_"
 az group create -l westus3 -n sfc-network-dev-rg_
 az group create -l westus3 -n sfc-firewall-dev-rg_
 
-az deployment group validate -g sfc-firewall-dev-rg_ -f main.json -p main.parameters.json adminPassword='5ham!!r0ck'
-az deployment group create -c -g sfc-firewall-dev-rg_ -f main.json -p main.parameters.json adminPassword='5ham!!r0ck'
+az deployment group validate -g sfc-firewall-dev-rg_ -f main.json -p main.parameters.json
+az deployment group create -c -g sfc-firewall-dev-rg_ -f main.json -p main.parameters.json
