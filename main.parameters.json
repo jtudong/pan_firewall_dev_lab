@@ -15,7 +15,7 @@
             "value": "sfc-firewall-dev-rg_"
         },
         "gitBranch": {
-            "value": "firewall"
+            "value": "master"
         },
         "nsgDeploymentTemplateName": {
             "value": "nsg.json"
@@ -31,6 +31,18 @@
         },
         "vmName": {
             "value": "aw3lpalnd01"
+        },
+        "vmSize":{
+            "value": "Standard_D3_v2"
+        },
+        "adminUsername": {
+            "value": "localadmin"
+        },
+        "imageVersion": {
+            "value": "10.1.0"
+        },
+        "adminPassword": {
+            "value": ""
         }
     }
 }
