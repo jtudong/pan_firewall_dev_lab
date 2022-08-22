@@ -4,4 +4,13 @@ trigger:
 pool:
   vmImage: ubuntu-latest
 
-steps:
+jobs:
+  - job: createResourceGroup
+    steps:
+      - task: AzureCLI@2
+        inputs:
+          azureSubscription: 'jtudong-pan-firewall-sandbox'
+          scriptType: 'bash'
+          scriptLocation: 'inlineScript'
+          inlineScript: 'az group create -l westus3 -n firewall-sandbox-rg'
+          failOnStandardError: true
