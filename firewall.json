@@ -14,6 +14,10 @@
                 "dev",
                 "sandbox"
             ]
+        },
+        "subnetPrefix": {
+            "type": "string",
+            "defaultValue": ""
         }
     },
     "functions": [],
@@ -23,10 +27,39 @@
             "Team": "networking",
             "Environment": "sandbox",
             "Application": "databricks"
-        }
+        },
+        "vnetName": "[concat(parameters('subnetPrefix'),'-',parameters('environment'),'-vnet')]"
     },
     "resources": [
-        
+    {
+        // create the vnet
+        "name": "[variables('vnetName')]",
+        "type": "Microsoft.Network/virtualNetworks",
+        "apiVersion": "2020-11-01",
+        "location": "[parameters('location')]",
+        "tags": "[variables('tags')]",
+        "properties": {
+            "addressSpace": {
+                "addressPrefixes": [
+                    "10.16.0.0/16"
+                ]
+            }/* ,
+            "subnets": [
+                {
+                    "name": "Subnet-1",
+                    "properties": {
+                        "addressPrefix": "10.16.90.0/24"
+                    }
+                },
+                {
+                    "name": "Subnet-2",
+                    "properties": {
+                        "addressPrefix": "10.16.91.0/24"
+                    }
+                }
+            ] */
+        }
+    }
     ],
     "outputs": {}
 }

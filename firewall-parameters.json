@@ -7,6 +7,9 @@
         },
         "environment": {
             "value": "sandbox"
+        },
+        "subnetPrefix": {
+            "value": "firewall"
         }
     }
 }
