@@ -31,35 +31,44 @@
         "vnetName": "[concat(parameters('subnetPrefix'),'-',parameters('environment'),'-vnet')]"
     },
     "resources": [
-    {
-        // create the vnet
-        "name": "[variables('vnetName')]",
-        "type": "Microsoft.Network/virtualNetworks",
-        "apiVersion": "2020-11-01",
-        "location": "[parameters('location')]",
-        "tags": "[variables('tags')]",
-        "properties": {
-            "addressSpace": {
-                "addressPrefixes": [
-                    "10.16.0.0/16"
-                ]
-            }/* ,
-            "subnets": [
-                {
-                    "name": "Subnet-1",
-                    "properties": {
-                        "addressPrefix": "10.16.90.0/24"
-                    }
+        {
+            // create the vnet
+            "name": "[variables('vnetName')]",
+            "type": "Microsoft.Network/virtualNetworks",
+            "apiVersion": "2020-11-01",
+            "location": "[parameters('location')]",
+            "tags": "[variables('tags')]",
+            "properties": {
+                "addressSpace": {
+                    "addressPrefixes": [
+                        "10.16.0.0/16"
+                    ]
                 },
-                {
-                    "name": "Subnet-2",
-                    "properties": {
-                        "addressPrefix": "10.16.91.0/24"
+                "subnets": [
+                    {
+                        "name": "firewall-management",
+                        "properties": {
+                            "addressPrefix": "10.16.90.0/24" /* ,
+                        "networkSecurityGroup": "" */
+                        }
+                    },
+                    {
+                        "name": "firewall-untrusted",
+                        "properties": {
+                            "addressPrefix": "10.16.91.0/24" /* ,
+                        "networkSecurityGroup": "" */
+                        }
+                    },
+                    {
+                        "name": "firewall-trusted",
+                        "properties": {
+                            "addressPrefix": "10.16.92.0/24" /* ,
+                        "networkSecurityGroup": "" */
+                        }
                     }
-                }
-            ] */
+                ]
+            }
         }
-    }
     ],
     "outputs": {}
 }
