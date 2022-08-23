@@ -14,3 +14,18 @@ jobs:
           scriptLocation: 'inlineScript'
           inlineScript: 'az group create -l westus3 -n firewall-sandbox-rg'
           failOnStandardError: true
+  - job: armTemplateDeployment
+    dependsOn: createResourceGroup
+    steps:
+      - task: AzureResourceManagerTemplateDeployment@3
+        inputs:
+          deploymentScope: 'Resource Group'
+          azureResourceManagerConnection: 'jtudong-pan-firewall-sandbox'
+          subscriptionId: '17df786b-c9ea-4f50-9cb0-57b80e526f55'
+          action: 'Create Or Update Resource Group'
+          resourceGroupName: 'firewall-sandbox-rg'
+          location: 'West US 3'
+          templateLocation: 'Linked artifact'
+          csmFile: 'firewall.json'
+          csmParametersFile: 'firewall-parameters.json'
+          deploymentMode: 'Incremental'
