@@ -10,6 +10,9 @@
         },
         "subnetPrefix": {
             "value": "firewall"
+        },
+        "pipCount": {
+            "value": 3
         }
     }
 }
