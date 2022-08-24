@@ -19,11 +19,11 @@
             "type": "string",
             "defaultValue": ""
         },
-        "pipCount": {
+        /* "pipCount": {
             "type": "int",
             "minValue": 3,
             "defaultValue": 3
-        },
+        }, */
         "paCount": {
             "type": "int",
             "defaultValue": 1,
@@ -175,7 +175,7 @@
             "properties": {
                 "securityRules": []
             }
-        },
+        }/* ,
         {
             // Public IP addresses
             "name": "[concat(parameters('subnetPrefix'),'-',parameters('environment'),copyIndex(1),'-pip')]",
@@ -208,7 +208,10 @@
                         "properties": {
                             "privateIPAllocationMethod": "Dynamic",
                             "subnet": {
-                                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vnet1Name'), 'subnet1')]"
+                                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vnet1Name'), variables('mgmtPrefix'))]"
+                            },
+                            "publicIPAddress": {
+                                "id": "[resourceId('Microsoft.Network/publicIPAddresses',concat(parameters('subnetPrefix'),'-',parameters('environment'),copyIndex(1),'-pip'))]"
                             }
                         }
                     }
@@ -218,7 +221,7 @@
                 "name": "UntrustNICCopy",
                 "count": "[parameters('paCount')]"
             }
-        }
+        } */
     ],
     "outputs": {}
 }
