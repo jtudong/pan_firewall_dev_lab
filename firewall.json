@@ -38,6 +38,7 @@
             "Environment": "[parameters('environment')]",
             "Application": "[parameters('subnetPrefix')]"
         },
+        "uniqueId": "[uniqueString(resourceGroup().id)]",
         "vnet1Name": "[concat(parameters('subnetPrefix'),'-',parameters('environment'),'-vnet')]",
         "mgmtPrefix": "[concat('firewall-management-',parameters('environment'))]",
         "untrustPrefix": "[concat('firewall-untrusted-',parameters('environment'))]",
@@ -175,7 +176,53 @@
             "properties": {
                 "securityRules": []
             }
-        }/* ,
+        },
+        {
+            // management PIP
+            "name": "[concat(variables('mgmtPrefix'),copyIndex(1),'-pip')]",
+            "comments": "index for number of firewalls",
+            "type": "Microsoft.Network/publicIPAddresses",
+            "apiVersion": "2020-11-01",
+            "location": "[parameters('location')]",
+            "tags": "[variables('tags')]",
+            "sku": {
+                "name": "Basic"
+            },
+            "properties": {
+                "publicIPAllocationMethod": "Dynamic",
+                "dnsSettings": {
+                    "domainNameLabel": "[concat('fw',copyIndex(1),'management', variables('uniqueId'))]"
+                }
+            },
+            "copy": {
+                "name": "managementPIPCopy",
+                "count": "[parameters('paCount')]"
+            }
+        },
+        {
+            // untrust PIP
+            "name": "[concat(variables('untrustPrefix'),copyIndex(1),'-pip')]",
+            "comments": "index for number of firewalls",
+            "type": "Microsoft.Network/publicIPAddresses",
+            "apiVersion": "2020-11-01",
+            "location": "[parameters('location')]",
+            "tags": "[variables('tags')]",
+            "sku": {
+                "name": "Basic"
+            },
+            "properties": {
+                "publicIPAllocationMethod": "Dynamic",
+                "dnsSettings": {
+                    "domainNameLabel": "[concat('fw',copyIndex(1),'untrust', variables('uniqueId'))]"
+                }
+            },
+            "copy": {
+                "name": "untrustPIPCopy",
+                "count": "[parameters('paCount')]"
+            }
+        }
+
+        /* ,
         {
             // Public IP addresses
             "name": "[concat(parameters('subnetPrefix'),'-',parameters('environment'),copyIndex(1),'-pip')]",
