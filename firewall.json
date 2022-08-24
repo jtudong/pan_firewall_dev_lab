@@ -1,0 +1,146 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "location": {
+            "type": "string",
+            "defaultValue": ""
+        },
+        "environment": {
+            "type": "string",
+            "defaultValue": "",
+            "allowedValues": [
+                "prod",
+                "dev",
+                "sandbox"
+            ]
+        },
+        "subnetPrefix": {
+            "type": "string",
+            "defaultValue": ""
+        }
+    },
+    "functions": [],
+    "variables": {
+        "tags": {
+            "Department": "it",
+            "Team": "networking",
+            "Environment": "sandbox",
+            "Application": "databricks"
+        },
+        "vnetName": "[concat(parameters('subnetPrefix'),'-',parameters('environment'),'-vnet')]"
+    },
+    "resources": [
+        {
+            // create the vnet
+            "name": "[variables('vnetName')]",
+            "type": "Microsoft.Network/virtualNetworks",
+            "apiVersion": "2020-11-01",
+            "dependsOn": ["[resourceId('Microsoft.Network/networkSecurityGroups', 'firewall-management-sandbox-nsg')]"],
+            "location": "[parameters('location')]",
+            "tags": "[variables('tags')]",
+            "properties": {
+                "addressSpace": {
+                    "addressPrefixes": [
+                        "10.16.0.0/16"
+                    ]
+                },
+                "subnets": [
+                    {
+                        "name": "firewall-management",
+                        "properties": {
+                            "addressPrefix": "10.16.90.0/24" ,
+                            "networkSecurityGroup": {
+                                "id": "[resourceId('Microsoft.Network/networkSecurityGroups','firewall-management-sandbox-nsg')]"
+                            }
+                        }
+                    },
+                    {
+                        "name": "firewall-untrusted",
+                        "properties": {
+                            "addressPrefix": "10.16.91.0/24" /* ,
+                        "networkSecurityGroup": "" */
+                        }
+                    },
+                    {
+                        "name": "firewall-trusted",
+                        "properties": {
+                            "addressPrefix": "10.16.92.0/24" /* ,
+                        "networkSecurityGroup": "" */
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "type": "Microsoft.Network/networkSecurityGroups",
+            "apiVersion": "2020-11-01",
+            "name": "firewall-management-sandbox-nsg",
+            "location": "westus3",
+            "properties": {
+                "securityRules": [
+                    {
+                        "name": "AllowGlobalProtect",
+                        "properties": {
+                            "protocol": "TCP",
+                            "sourcePortRange": "*",
+                            "sourceAddressPrefix": "10.10.24.0/24",
+                            "destinationAddressPrefix": "*",
+                            "access": "Allow",
+                            "priority": 1200,
+                            "direction": "Inbound",
+                            "sourcePortRanges": [],
+                            "destinationPortRanges": [
+                                "22",
+                                "443"
+                            ],
+                            "sourceAddressPrefixes": [],
+                            "destinationAddressPrefixes": []
+                        }
+                    },
+                    {
+                        "name": "AllowManagementInbound",
+                        "properties": {
+                            "description": "AllowManagementInbound",
+                            "protocol": "*",
+                            "sourcePortRange": "*",
+                            "destinationAddressPrefix": "*",
+                            "access": "Allow",
+                            "priority": 1300,
+                            "direction": "Inbound",
+                            "sourcePortRanges": [],
+                            "destinationPortRanges": [
+                                "22",
+                                "443"
+                            ],
+                            "sourceAddressPrefixes": [
+                                "63.156.58.20/32",
+                                "4.1.98.242/32",
+                                "72.208.101.143/32"
+                            ],
+                            "destinationAddressPrefixes": []
+                        }
+                    },
+                    {
+                        "name": "DenyAllInBound",
+                        "properties": {
+                            "protocol": "*",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "*",
+                            "sourceAddressPrefix": "*",
+                            "destinationAddressPrefix": "*",
+                            "access": "Deny",
+                            "priority": 1400,
+                            "direction": "Inbound",
+                            "sourcePortRanges": [],
+                            "destinationPortRanges": [],
+                            "sourceAddressPrefixes": [],
+                            "destinationAddressPrefixes": []
+                        }
+                    }
+                ]
+            }
+        }
+    ],
+    "outputs": {}
+}
