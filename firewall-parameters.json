@@ -13,6 +13,9 @@
         },
         "pipCount": {
             "value": 3
+        },
+        "paCount": {
+            "value": 1
         }
     }
 }

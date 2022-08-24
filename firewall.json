@@ -23,6 +23,11 @@
             "type": "int",
             "minValue": 3,
             "defaultValue": 3
+        },
+        "paCount": {
+            "type": "int",
+            "defaultValue": 1,
+            "minValue": 1
         }
     },
     "functions": [],
@@ -184,6 +189,34 @@
             "copy": {
                 "name": "PIPcopy",
                 "count": "[parameters('pipCount')]"
+            }
+        },
+        {
+            // create the Network interfaces
+            "name": "[concat(variables('mgmtPrefix'),'-',copyIndex(1),'-nic')]",
+            "type": "Microsoft.Network/networkInterfaces",
+            "apiVersion": "2020-11-01",
+            "location": "[parameters('location')]",
+            "tags": "[variables('tags')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/virtualNetworks', variables('vnet1Name'))]"
+            ],
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "ipConfig1",
+                        "properties": {
+                            "privateIPAllocationMethod": "Dynamic",
+                            "subnet": {
+                                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vnet1Name'), 'subnet1')]"
+                            }
+                        }
+                    }
+                ]
+            },
+            "copy": {
+                "name": "UntrustNICCopy",
+                "count": "[parameters('paCount')]"
             }
         }
     ],
