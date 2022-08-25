@@ -433,5 +433,10 @@
             }
         }
     ],
-    "outputs": {}
+    "outputs": {
+        "username": {
+            "type": "string",
+            "value": "[reference(resourceId('Microsoft.Compute/virtualMachines',parameters('fwName'))).osProfile.adminUsername]"
+        }
+    }
 }
