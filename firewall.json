@@ -274,7 +274,8 @@
             "tags": "[variables('tags')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Network/publicIPAddresses',concat(variables('mgmtPrefix'),copyIndex(1),'-pip'))]",
-                "[resourceId('Microsoft.Network/networkSecurityGroups', concat(variables('mgmtPrefix'),'-nsg'))]"
+                "[resourceId('Microsoft.Network/networkSecurityGroups', concat(variables('mgmtPrefix'),'-nsg'))]",
+                "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vnet1Name'), variables('mgmtPrefix'))]"
             ],
             "properties": {
                 "ipConfigurations": [
@@ -306,7 +307,8 @@
             "tags": "[variables('tags')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Network/publicIPAddresses',concat(variables('untrustPrefix'),copyIndex(1),'-pip'))]",
-                "[resourceId('Microsoft.Network/networkSecurityGroups', concat(variables('untrustPrefix'),'-nsg'))]"
+                "[resourceId('Microsoft.Network/networkSecurityGroups', concat(variables('untrustPrefix'),'-nsg'))]",
+                "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vnet1Name'), variables('untrustPrefix'))]"
             ],
             "properties": {
                 "ipConfigurations": [
@@ -337,7 +339,8 @@
             "location": "[parameters('location')]",
             "tags": "[variables('tags')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Network/networkSecurityGroups', concat(variables('trustPrefix'),'-nsg'))]"
+                "[resourceId('Microsoft.Network/networkSecurityGroups', concat(variables('trustPrefix'),'-nsg'))]",
+                "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vnet1Name'), variables('trustPrefix'))]"
             ],
             "properties": {
                 "ipConfigurations": [
