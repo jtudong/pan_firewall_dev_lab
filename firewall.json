@@ -259,17 +259,48 @@
                 "name": "managementNICCopy",
                 "count": "[parameters('paCount')]"
             }
-        }
-
-        /*
-            // create the Network interfaces
-            "name": "[concat(variables('mgmtPrefix'),'-',copyIndex(1),'-nic')]",
+        },
+        {
+            // create the Untrusted NIC
+            "name": "[concat(variables('untrustPrefix'),copyIndex(1),'-nic')]",
             "type": "Microsoft.Network/networkInterfaces",
             "apiVersion": "2020-11-01",
             "location": "[parameters('location')]",
             "tags": "[variables('tags')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Network/virtualNetworks', variables('vnet1Name'))]"
+                "[resourceId('Microsoft.Network/publicIPAddresses',concat(variables('untrustPrefix'),copyIndex(1),'-pip'))]",
+                "[resourceId('Microsoft.Network/networkSecurityGroups', concat(variables('untrustPrefix'),'-nsg'))]"
+            ],
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "ipConfig1",
+                        "properties": {
+                            "privateIPAllocationMethod": "Dynamic",
+                            "publicIPAddress": {
+                                "id": "[resourceId('Microsoft.Network/publicIPAddresses',concat(variables('untrustPrefix'),copyIndex(1),'-pip'))]"
+                            },
+                            "subnet": {
+                                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vnet1Name'), variables('untrustPrefix'))]"
+                            }
+                        }
+                    }
+                ]
+            },
+            "copy": {
+                "name": "untrustedNICCopy",
+                "count": "[parameters('paCount')]"
+            }
+        },
+        {
+            // create the Trusted NIC
+            "name": "[concat(variables('trustPrefix'),copyIndex(1),'-nic')]",
+            "type": "Microsoft.Network/networkInterfaces",
+            "apiVersion": "2020-11-01",
+            "location": "[parameters('location')]",
+            "tags": "[variables('tags')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/networkSecurityGroups', concat(variables('trustPrefix'),'-nsg'))]"
             ],
             "properties": {
                 "ipConfigurations": [
@@ -278,20 +309,17 @@
                         "properties": {
                             "privateIPAllocationMethod": "Dynamic",
                             "subnet": {
-                                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vnet1Name'), variables('mgmtPrefix'))]"
-                            },
-                            "publicIPAddress": {
-                                "id": "[resourceId('Microsoft.Network/publicIPAddresses',concat(parameters('subnetPrefix'),'-',parameters('environment'),copyIndex(1),'-pip'))]"
+                                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vnet1Name'), variables('trustPrefix'))]"
                             }
                         }
                     }
                 ]
             },
             "copy": {
-                "name": "UntrustNICCopy",
+                "name": "trustedNICCopy",
                 "count": "[parameters('paCount')]"
             }
-        } */
+        }
     ],
     "outputs": {}
 }
