@@ -9,7 +9,7 @@ jobs:
     steps:
       - task: AzureCLI@2
         inputs:
-          azureSubscription: 'jtudong-pan-firewall-sandbox'
+          azureSubscription: 'pan-firewall-dev-lab-vs_sandbox'
           scriptType: 'bash'
           scriptLocation: 'inlineScript'
           inlineScript: 'az group create -l westus3 -n firewall-sandbox-rg'
@@ -20,8 +20,8 @@ jobs:
       - task: AzureResourceManagerTemplateDeployment@3
         inputs:
           deploymentScope: 'Resource Group'
-          azureResourceManagerConnection: 'jtudong-pan-firewall-sandbox'
-          subscriptionId: '17df786b-c9ea-4f50-9cb0-57b80e526f55'
+          azureResourceManagerConnection: 'pan-firewall-dev-lab-vs_sandbox'
+          subscriptionId: '6081cfb9-7cb9-4b84-8be8-337fdcac59f6'
           action: 'Create Or Update Resource Group'
           resourceGroupName: 'firewall-sandbox-rg'
           location: 'West US 3'
