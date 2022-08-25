@@ -18,6 +18,23 @@
         "subnetPrefix": {
             "type": "string",
             "defaultValue": ""
+        },
+        "paCount": {
+            "type": "int",
+            "defaultValue": 1,
+            "minValue": 1
+        },
+        "mgmtPrivateIP": {
+            "type": "int",
+            "defaultValue": 4
+        },
+        "untrustPrivateIP": {
+            "type": "int",
+            "defaultValue": 4
+        },
+        "trustPrivateIP": {
+            "type": "int",
+            "defaultValue": 4
         }
     },
     "functions": [],
@@ -25,18 +42,22 @@
         "tags": {
             "Department": "it",
             "Team": "networking",
-            "Environment": "sandbox",
-            "Application": "databricks"
+            "Environment": "[parameters('environment')]",
+            "Application": "[parameters('subnetPrefix')]"
         },
-        "vnetName": "[concat(parameters('subnetPrefix'),'-',parameters('environment'),'-vnet')]"
+        "uniqueId": "[uniqueString(resourceGroup().id)]",
+        "vnet1Name": "[concat(parameters('subnetPrefix'),'-',parameters('environment'),'-vnet')]",
+        "mgmtPrefix": "[concat('firewall-management-',parameters('environment'))]",
+        "untrustPrefix": "[concat('firewall-untrusted-',parameters('environment'))]",
+        "trustPrefix": "[concat('firewall-trusted-',parameters('environment'))]"
     },
     "resources": [
         {
             // create the vnet
-            "name": "[variables('vnetName')]",
+            "name": "[variables('vnet1Name')]",
             "type": "Microsoft.Network/virtualNetworks",
             "apiVersion": "2020-11-01",
-            "dependsOn": ["[resourceId('Microsoft.Network/networkSecurityGroups', 'firewall-management-sandbox-nsg')]"],
+            "dependsOn": [ "[resourceId('Microsoft.Network/networkSecurityGroups', concat(variables('mgmtPrefix'),'-nsg'))]" ],
             "location": "[parameters('location')]",
             "tags": "[variables('tags')]",
             "properties": {
@@ -47,23 +68,23 @@
                 },
                 "subnets": [
                     {
-                        "name": "firewall-management",
+                        "name": "[variables('mgmtPrefix')]",
                         "properties": {
-                            "addressPrefix": "10.16.90.0/24" ,
+                            "addressPrefix": "10.16.90.0/24",
                             "networkSecurityGroup": {
-                                "id": "[resourceId('Microsoft.Network/networkSecurityGroups','firewall-management-sandbox-nsg')]"
+                                "id": "[resourceId('Microsoft.Network/networkSecurityGroups',concat(variables('mgmtPrefix'),'-nsg'))]"
                             }
                         }
                     },
                     {
-                        "name": "firewall-untrusted",
+                        "name": "[variables('untrustPrefix')]",
                         "properties": {
                             "addressPrefix": "10.16.91.0/24" /* ,
                         "networkSecurityGroup": "" */
                         }
                     },
                     {
-                        "name": "firewall-trusted",
+                        "name": "[variables('trustPrefix')]",
                         "properties": {
                             "addressPrefix": "10.16.92.0/24" /* ,
                         "networkSecurityGroup": "" */
@@ -73,9 +94,11 @@
             }
         },
         {
+            //  management NSG
             "type": "Microsoft.Network/networkSecurityGroups",
             "apiVersion": "2020-11-01",
-            "name": "firewall-management-sandbox-nsg",
+            //"name": "firewall-management-sandbox-nsg",
+            "name": "[concat(variables('mgmtPrefix'),'-nsg')]",
             "location": "westus3",
             "properties": {
                 "securityRules": [
@@ -139,6 +162,162 @@
                         }
                     }
                 ]
+            }
+        },
+        {
+            // untrust NSG
+            "type": "Microsoft.Network/networkSecurityGroups",
+            "apiVersion": "2020-11-01",
+            "name": "[concat(variables('untrustPrefix'),'-nsg')]",
+            "location": "westus3",
+            "properties": {
+                "securityRules": []
+            }
+        },
+        {
+            // trust NSG
+            "type": "Microsoft.Network/networkSecurityGroups",
+            "apiVersion": "2020-11-01",
+            "name": "[concat(variables('trustPrefix'),'-nsg')]",
+            "location": "westus3",
+            "properties": {
+                "securityRules": []
+            }
+        },
+        {
+            // management PIP
+            "name": "[concat(variables('mgmtPrefix'),copyIndex(1),'-pip')]",
+            "comments": "index for number of firewalls",
+            "type": "Microsoft.Network/publicIPAddresses",
+            "apiVersion": "2020-11-01",
+            "location": "[parameters('location')]",
+            "tags": "[variables('tags')]",
+            "sku": {
+                "name": "Basic"
+            },
+            "properties": {
+                "publicIPAllocationMethod": "Dynamic",
+                "dnsSettings": {
+                    "domainNameLabel": "[concat('fw',copyIndex(1),'management', variables('uniqueId'))]"
+                }
+            },
+            "copy": {
+                "name": "managementPIPCopy",
+                "count": "[parameters('paCount')]"
+            }
+        },
+        {
+            // untrust PIP
+            "name": "[concat(variables('untrustPrefix'),copyIndex(1),'-pip')]",
+            "comments": "index for number of firewalls",
+            "type": "Microsoft.Network/publicIPAddresses",
+            "apiVersion": "2020-11-01",
+            "location": "[parameters('location')]",
+            "tags": "[variables('tags')]",
+            "sku": {
+                "name": "Basic"
+            },
+            "properties": {
+                "publicIPAllocationMethod": "Dynamic",
+                "dnsSettings": {
+                    "domainNameLabel": "[concat('fw',copyIndex(1),'untrust', variables('uniqueId'))]"
+                }
+            },
+            "copy": {
+                "name": "untrustPIPCopy",
+                "count": "[parameters('paCount')]"
+            }
+        },
+        {
+            // create the Management NIC
+            "name": "[concat(variables('mgmtPrefix'),copyIndex(1),'-nic')]",
+            "type": "Microsoft.Network/networkInterfaces",
+            "apiVersion": "2020-11-01",
+            "location": "[parameters('location')]",
+            "tags": "[variables('tags')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/publicIPAddresses',concat(variables('mgmtPrefix'),copyIndex(1),'-pip'))]",
+                "[resourceId('Microsoft.Network/networkSecurityGroups', concat(variables('mgmtPrefix'),'-nsg'))]"
+            ],
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "[concat(variables('mgmtPrefix'),copyIndex(1))]",
+                        "properties": {
+                            "privateIPAllocationMethod": "Dynamic",
+                            "publicIPAddress": {
+                                "id": "[resourceId('Microsoft.Network/publicIPAddresses',concat(variables('mgmtPrefix'),copyIndex(1),'-pip'))]"
+                            },
+                            "subnet": {
+                                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vnet1Name'), variables('mgmtPrefix'))]"
+                            }
+                        }
+                    }
+                ]
+            },
+            "copy": {
+                "name": "managementNICCopy",
+                "count": "[parameters('paCount')]"
+            }
+        },
+        {
+            // create the Untrusted NIC
+            "name": "[concat(variables('untrustPrefix'),copyIndex(1),'-nic')]",
+            "type": "Microsoft.Network/networkInterfaces",
+            "apiVersion": "2020-11-01",
+            "location": "[parameters('location')]",
+            "tags": "[variables('tags')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/publicIPAddresses',concat(variables('untrustPrefix'),copyIndex(1),'-pip'))]",
+                "[resourceId('Microsoft.Network/networkSecurityGroups', concat(variables('untrustPrefix'),'-nsg'))]"
+            ],
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "ipConfig1",
+                        "properties": {
+                            "privateIPAllocationMethod": "Dynamic",
+                            "publicIPAddress": {
+                                "id": "[resourceId('Microsoft.Network/publicIPAddresses',concat(variables('untrustPrefix'),copyIndex(1),'-pip'))]"
+                            },
+                            "subnet": {
+                                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vnet1Name'), variables('untrustPrefix'))]"
+                            }
+                        }
+                    }
+                ]
+            },
+            "copy": {
+                "name": "untrustedNICCopy",
+                "count": "[parameters('paCount')]"
+            }
+        },
+        {
+            // create the Trusted NIC
+            "name": "[concat(variables('trustPrefix'),copyIndex(1),'-nic')]",
+            "type": "Microsoft.Network/networkInterfaces",
+            "apiVersion": "2020-11-01",
+            "location": "[parameters('location')]",
+            "tags": "[variables('tags')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/networkSecurityGroups', concat(variables('trustPrefix'),'-nsg'))]"
+            ],
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "ipConfig1",
+                        "properties": {
+                            "privateIPAllocationMethod": "Dynamic",
+                            "subnet": {
+                                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vnet1Name'), variables('trustPrefix'))]"
+                            }
+                        }
+                    }
+                ]
+            },
+            "copy": {
+                "name": "trustedNICCopy",
+                "count": "[parameters('paCount')]"
             }
         }
     ],
