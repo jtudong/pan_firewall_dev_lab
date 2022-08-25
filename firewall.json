@@ -436,7 +436,7 @@
     "outputs": {
         "username1": {
             "type": "object",
-            "value": "[reference(concat(resourceId('Microsoft.Compute/virtualMachines',parameters('fwName')),'1'))]"
+            "value": "[reference(concat(resourceId('Microsoft.Compute/virtualMachines',parameters('fwName')),'1')).osProfile.adminUsername]"
         }
     }
 }
