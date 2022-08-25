@@ -11,9 +11,6 @@
         "subnetPrefix": {
             "value": "firewall"
         },
-        "pipCount": {
-            "value": 3
-        },
         "paCount": {
             "value": 1
         }
