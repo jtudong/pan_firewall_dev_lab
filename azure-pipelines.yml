@@ -14,8 +14,18 @@ jobs:
           scriptLocation: 'inlineScript'
           inlineScript: 'az group create -l westus3 -n firewall-sandbox-rg'
           failOnStandardError: true
-  - job: armTemplateDeployment
+  - job: acceptTerms
     dependsOn: createResourceGroup
+    steps:
+    - task: AzureCLI@2
+      inputs:
+        azureSubscription: 'pan-firewall-dev-lab-vs_sandbox'
+        scriptType: 'bash'
+        scriptLocation: 'inlineScript'
+        inlineScript: 'az vm image terms accept --urn paloaltonetworks:vmseries1:byol:9.1.0'
+        failOnStandardError: true
+  - job: armTemplateDeployment
+    dependsOn: acceptTerms
     steps:
       - task: AzureResourceManagerTemplateDeployment@3
         inputs:
