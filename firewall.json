@@ -19,15 +19,22 @@
             "type": "string",
             "defaultValue": ""
         },
-        /* "pipCount": {
-            "type": "int",
-            "minValue": 3,
-            "defaultValue": 3
-        }, */
         "paCount": {
             "type": "int",
             "defaultValue": 1,
             "minValue": 1
+        },
+        "mgmtPrivateIP": {
+            "type": "int",
+            "defaultValue": 4
+        },
+        "untrustPrivateIP": {
+            "type": "int",
+            "defaultValue": 4
+        },
+        "trustPrivateIP": {
+            "type": "int",
+            "defaultValue": 4
         }
     },
     "functions": [],
@@ -220,25 +227,41 @@
                 "name": "untrustPIPCopy",
                 "count": "[parameters('paCount')]"
             }
-        }
-
-        /* ,
+        },
         {
-            // Public IP addresses
-            "name": "[concat(parameters('subnetPrefix'),'-',parameters('environment'),copyIndex(1),'-pip')]",
-            "type": "Microsoft.Network/publicIPAddresses",
+            // create the Management NIC
+            "name": "[concat(variables('mgmtPrefix'),copyIndex(1),'-nic')]",
+            "type": "Microsoft.Network/networkInterfaces",
             "apiVersion": "2020-11-01",
             "location": "[parameters('location')]",
             "tags": "[variables('tags')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/publicIPAddresses',concat(variables('mgmtPrefix'),copyIndex(1),'-pip'))]",
+                "[resourceId('Microsoft.Network/networkSecurityGroups', concat(variables('mgmtPrefix'),'-nsg'))]"
+            ],
             "properties": {
-                "publicIPAllocationMethod": "Dynamic"
+                "ipConfigurations": [
+                    {
+                        "name": "[concat(variables('mgmtPrefix'),copyIndex(1))]",
+                        "properties": {
+                            "privateIPAllocationMethod": "Dynamic",
+                            "publicIPAddress": {
+                                "id": "[resourceId('Microsoft.Network/publicIPAddresses',concat(variables('mgmtPrefix'),copyIndex(1),'-pip'))]"
+                            },
+                            "subnet": {
+                                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vnet1Name'), variables('mgmtPrefix'))]"
+                            }
+                        }
+                    }
+                ]
             },
             "copy": {
-                "name": "PIPcopy",
-                "count": "[parameters('pipCount')]"
+                "name": "managementNICCopy",
+                "count": "[parameters('paCount')]"
             }
-        },
-        {
+        }
+
+        /*
             // create the Network interfaces
             "name": "[concat(variables('mgmtPrefix'),'-',copyIndex(1),'-nic')]",
             "type": "Microsoft.Network/networkInterfaces",
