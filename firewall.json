@@ -434,9 +434,10 @@
         }
     ],
     "outputs": {
-        "username": {
+        "username1": {
             "type": "string",
-            "value": "[reference(resourceId('Microsoft.Compute/virtualMachines',parameters('fwName'))).osProfile.adminUsername]"
+            //"value": "[reference(resourceId('Microsoft.Compute/virtualMachines',parameters('fwName'))).osProfile.adminUsername]"
+            "value": "[reference(concat(resourceId('Microsoft.Compute/virtualMachines',parameters('fwName')),'1'))]"
         }
     }
 }
