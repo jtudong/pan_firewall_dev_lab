@@ -9,19 +9,29 @@ jobs:
     steps:
       - task: AzureCLI@2
         inputs:
-          azureSubscription: 'jtudong-pan-firewall-sandbox'
+          azureSubscription: 'pan-firewall-dev-lab-vs_sandbox'
           scriptType: 'bash'
           scriptLocation: 'inlineScript'
           inlineScript: 'az group create -l westus3 -n firewall-sandbox-rg'
           failOnStandardError: true
-  - job: armTemplateDeployment
+  - job: acceptTerms
     dependsOn: createResourceGroup
+    steps:
+    - task: AzureCLI@2
+      inputs:
+        azureSubscription: 'pan-firewall-dev-lab-vs_sandbox'
+        scriptType: 'bash'
+        scriptLocation: 'inlineScript'
+        inlineScript: 'az vm image terms accept --urn paloaltonetworks:vmseries1:byol:9.1.0'
+        failOnStandardError: true
+  - job: armTemplateDeployment
+    dependsOn: acceptTerms
     steps:
       - task: AzureResourceManagerTemplateDeployment@3
         inputs:
           deploymentScope: 'Resource Group'
-          azureResourceManagerConnection: 'jtudong-pan-firewall-sandbox'
-          subscriptionId: '17df786b-c9ea-4f50-9cb0-57b80e526f55'
+          azureResourceManagerConnection: 'pan-firewall-dev-lab-vs_sandbox'
+          subscriptionId: '6081cfb9-7cb9-4b84-8be8-337fdcac59f6'
           action: 'Create Or Update Resource Group'
           resourceGroupName: 'firewall-sandbox-rg'
           location: 'West US 3'
@@ -29,3 +39,14 @@ jobs:
           csmFile: 'firewall.json'
           csmParametersFile: 'firewall-parameters.json'
           deploymentMode: 'Incremental'
+          overrideParameters: '-adminPassword $(adminPassword)'
+  - job: cancelTerms
+    dependsOn: armTemplateDeployment
+    steps:
+      - task: AzureCLI@2
+        inputs:
+          azureSubscription: 'pan-firewall-dev-lab-vs_sandbox'
+          scriptType: 'bash'
+          scriptLocation: 'inlineScript'
+          inlineScript: 'az vm image terms cancel --urn paloaltonetworks:vmseries1:byol:9.1.0'
+          failOnStandardError: true
