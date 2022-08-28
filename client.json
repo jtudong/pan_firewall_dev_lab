@@ -1,0 +1,72 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "adminPassword": {
+            "type": "securestring",
+            "defaultValue": ""
+        },
+        "adminUsername": {
+            "type": "string",
+            "defaultValue": "sfcadmin"
+        },
+        "environment": {
+            "type": "string",
+            "defaultValue": "",
+            "allowedValues": [
+                "prod",
+                "dev",
+                "sandbox"
+            ]
+        },
+        "location": {
+            "type": "string",
+            "defaultValue": "westus3",
+            "allowedValues": ["westus3"]
+        },
+        "osDiskType": {
+            "type": "string",
+            "defaultValue": "Standard_LRS"
+        },
+        "subnetPrefix": {
+            "type": "string",
+            "defaultValue": "firewall",
+            "metadata": {
+                "description": "The name of the subnet"
+            }
+        },
+        "virtualMachineName": {
+            "type": "string",
+            "defaultValue": "test-vm",
+            "metadata":{
+                "description": "The name of the virtual machine"
+            }
+        },
+        "virtualMachineSize": {
+            "type": "string",
+            "defaultValue":"Standard_B2s",
+            "allowedValues": [
+                "Standard_B1s",
+                "Standard_B2s",
+                "Standard_B2ms",
+                "Standard_DS1_v2",
+                "Standard_DS2_v3"
+            ]
+        }
+    },
+    "functions": [],
+    "variables": {
+        "tags": {
+            "Department": "it",
+            "Team": "networking",
+            "Environment": "[parameters('environment')]",
+            "Application": "[parameters('subnetPrefix')]"
+        },
+        "uniqueId": "[uniqueString(resourceGroup().id)]",
+        "vnetName": "[concat(parameters('subnetPrefix'),'-',parameters('environment'),'-vnet')]"
+    },
+    "resources": [
+        
+    ],
+    "outputs": {}
+}
