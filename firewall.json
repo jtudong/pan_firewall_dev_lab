@@ -437,6 +437,10 @@
         "username1": {
             "type": "string",
             "value": "[reference(concat(resourceId('Microsoft.Compute/virtualMachines',parameters('fwName')),'1')).osProfile.adminUsername]"
+        },
+        "vnetName": {
+            "type": "string",
+            "value": "[resourceId('Microsoft.Network/virtualNetworks',variables('vnet1Name'))]"
         }
     }
 }
