@@ -63,10 +63,36 @@
             "Application": "[parameters('subnetPrefix')]"
         },
         "uniqueId": "[uniqueString(resourceGroup().id)]",
-        "vnetName": "[concat(parameters('subnetPrefix'),'-',parameters('environment'),'-vnet')]"
+        "vnetName": "[concat(parameters('subnetPrefix'),'-',parameters('environment'),'-vnet')]",
+        "networkInterfaceName": "[concat(parameters('virtualMachineName'),'-01','-nic')]",
+        "networkSecurityGroupName": "[concat(parameters('subnetPrefix'),'-nsg')]",
+        "osDiskName": "[concat(parameters('virtualMachineName'),'-os-disk')]",
+        "storageAccountName": "[concat(parameters('subnetPrefix'),variables('uniqueId'),'sa')]"
+        
     },
     "resources": [
-        
+        //    network interface
+        {
+            "name": "[variables('networkInterfaceName')]",
+            "type": "Microsoft.Network/networkInterfaces",
+            "apiVersion": "2020-11-01",
+            "location": "[parameters('location')]",
+            "tags": "[variables('tags')]",
+            "dependsOn": [],
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "ipConfig1",
+                        "properties": {
+                            "privateIPAllocationMethod": "Dynamic",
+                            "subnet": {
+                                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', 'virtualNetwork1', 'subnet1')]"
+                            }
+                        }
+                    }
+                ]
+            }
+        }
     ],
     "outputs": {}
 }

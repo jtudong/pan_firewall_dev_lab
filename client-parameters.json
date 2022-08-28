@@ -19,6 +19,9 @@
         },
         "virtualMachineSize": {
             "value": "Standard_B2s"
+        },
+        "virtualMachineName": {
+            "value": "aw3lfwclient"
         }
     }
 }
