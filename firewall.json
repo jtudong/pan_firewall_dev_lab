@@ -441,6 +441,10 @@
         "vnetName": {
             "type": "string",
             "value": "[resourceId('Microsoft.Network/virtualNetworks',variables('vnet1Name'))]"
+        },
+        "trustedSubnetName": {
+            "type": "string",
+            "value": "[resourceId('Microsoft.Network/virtualNetworks/subnets',variables('vnet1Name'),variables('trustPrefix'))]"
         }
     }
 }

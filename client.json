@@ -78,7 +78,9 @@
             "apiVersion": "2020-11-01",
             "location": "[parameters('location')]",
             "tags": "[variables('tags')]",
-            "dependsOn": [],
+            "dependsOn": [
+                "/subscriptions/6081cfb9-7cb9-4b84-8be8-337fdcac59f6/resourceGroups/firewall-sandbox-rg/providers/Microsoft.Network/virtualNetworks/firewall-sandbox-vnet"
+            ],
             "properties": {
                 "ipConfigurations": [
                     {
@@ -86,7 +88,7 @@
                         "properties": {
                             "privateIPAllocationMethod": "Dynamic",
                             "subnet": {
-                                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', 'virtualNetwork1', 'subnet1')]"
+                                "id": ""
                             }
                         }
                     }
