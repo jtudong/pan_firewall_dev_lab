@@ -24,7 +24,7 @@ jobs:
         scriptLocation: 'inlineScript'
         inlineScript: 'az vm image terms accept --urn paloaltonetworks:vmseries1:byol:9.1.0'
         failOnStandardError: true
-  - job: armTemplateDeployment
+  - job: armTemplateDeploymentFirewall
     dependsOn: acceptTerms
     steps:
       - task: AzureResourceManagerTemplateDeployment@3
