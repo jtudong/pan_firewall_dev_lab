@@ -94,9 +94,11 @@
             "name": "[variables('vnet1Name')]",
             "type": "Microsoft.Network/virtualNetworks",
             "apiVersion": "2020-11-01",
-            "dependsOn": [ 
+            "dependsOn": [
                 "[resourceId('Microsoft.Network/networkSecurityGroups', concat(variables('mgmtPrefix'),'-nsg'))]",
-                "[resourceId('Microsoft.Network/routeTables', 'firewall-trusted-rt')]"
+                "[resourceId('Microsoft.Network/networkSecurityGroups', concat(variables('untrustPrefix'),'-nsg'))]",
+                "[resourceId('Microsoft.Network/routeTables', 'firewall-trusted-rt')]",
+                "[resourceId('Microsoft.Network/routeTables','firewall-untrusted-rt')]"
             ],
             "location": "[parameters('location')]",
             "tags": "[variables('tags')]",
@@ -119,8 +121,11 @@
                     {
                         "name": "[variables('untrustPrefix')]",
                         "properties": {
-                            "addressPrefix": "10.16.91.0/24" /* ,
-                        "networkSecurityGroup": "" */
+                            "addressPrefix": "10.16.91.0/24" ,
+                        "networkSecurityGroup": "[resourceId('Microsoft.Network/networkSecurityGroups',concat(variables('untrustPrefix'),'-nsg'))]",
+                            "routeTable": {
+                                "id": "[resourceId('Microsoft.Network/routeTables','firewall-untrusted-rt')]"
+                            }
                         }
                     },
                     {
@@ -128,9 +133,9 @@
                         "properties": {
                             "addressPrefix": "10.16.92.0/24" /* ,
                         "networkSecurityGroup": "" */,
-                        "routeTable": {
-                            "id": "[resourceId('Microsoft.Network/routeTables','firewall-trusted-rt')]"
-                        }
+                            "routeTable": {
+                                "id": "[resourceId('Microsoft.Network/routeTables','firewall-trusted-rt')]"
+                            }
                         }
                     }
                 ]
@@ -214,7 +219,86 @@
             "name": "[concat(variables('untrustPrefix'),'-nsg')]",
             "location": "westus3",
             "properties": {
-                "securityRules": []
+                "securityRules": [
+                    {
+                        "name": "AllowAzureHealthProbeInBound",
+                        "type": "Microsoft.Network/networkSecurityGroups/securityRules",
+                        "properties": {
+                            "description": "AllowAzureHealthProbeInBound",
+                            "protocol": "*",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "*",
+                            "sourceAddressPrefix": "168.63.129.16/32",
+                            "destinationAddressPrefix": "10.117.2.0/24",
+                            "access": "Allow",
+                            "priority": 1000,
+                            "direction": "Inbound",
+                            "sourcePortRanges": [],
+                            "destinationPortRanges": [],
+                            "sourceAddressPrefixes": [],
+                            "destinationAddressPrefixes": []
+                        }
+                    },
+                    {
+                        "name": "Allow443And80InBound",
+                        "type": "Microsoft.Network/networkSecurityGroups/securityRules",
+                        "properties": {
+                            "description": "Allow443And80InBound",
+                            "protocol": "*",
+                            "sourcePortRange": "*",
+                            "sourceAddressPrefix": "*",
+                            "destinationAddressPrefix": "*",
+                            "access": "Allow",
+                            "priority": 1100,
+                            "direction": "Inbound",
+                            "sourcePortRanges": [],
+                            "destinationPortRanges": [
+                                "443",
+                                "80"
+                            ],
+                            "sourceAddressPrefixes": [],
+                            "destinationAddressPrefixes": []
+                        }
+                    },
+                    {
+                        "name": "DenyAnyInBound",
+                        "type": "Microsoft.Network/networkSecurityGroups/securityRules",
+                        "properties": {
+                            "description": "DenyAnyInBound",
+                            "protocol": "*",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "*",
+                            "sourceAddressPrefix": "*",
+                            "destinationAddressPrefix": "*",
+                            "access": "Deny",
+                            "priority": 1200,
+                            "direction": "Inbound",
+                            "sourcePortRanges": [],
+                            "destinationPortRanges": [],
+                            "sourceAddressPrefixes": [],
+                            "destinationAddressPrefixes": []
+                        }
+                    },
+                    {
+                        "name": "DenyToVnetOutbound",
+                        "type": "Microsoft.Network/networkSecurityGroups/securityRules",
+                        "properties": {
+                            "description": "DenyToVnetOutbound",
+                            "protocol": "*",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "*",
+                            "sourceAddressPrefix": "*",
+                            "destinationAddressPrefix": "10.16.0.0/16",
+                            "access": "Deny",
+                            "priority": 1000,
+                            "direction": "Outbound",
+                            "sourcePortRanges": [],
+                            "destinationPortRanges": [],
+                            "sourceAddressPrefixes": [],
+                            "destinationAddressPrefixes": []
+                        }
+                    }
+                ]
             }
         },
         {
@@ -433,7 +517,7 @@
                 "[resourceId('Microsoft.Network/networkInterfaces', concat(variables('trustPrefix'),copyIndex(1),'-nic'))]",
                 "[resourceId('Microsoft.Network/networkInterfaces', concat(variables('untrustPrefix'),copyIndex(1),'-nic'))]"
             ],
-            "copy":{
+            "copy": {
                 "name": "paVmCopy",
                 "count": "[parameters('paCount')]"
             }
@@ -465,7 +549,7 @@
                             "nextHopIpAddress": "10.16.92.4",
                             "hasBgpOverride": false
                         }
-                    }/* ,
+                    } /* ,
                     {
                         "name": "vpngw-forced-firewall",
                         "properties": {
@@ -485,6 +569,18 @@
                         }
                     } */
                 ]
+            }
+        },
+        {
+            // Unrusted subnet route table
+            "type": "Microsoft.Network/routeTables",
+            "apiVersion": "2020-11-01",
+            "name": "firewall-untrusted-rt",
+            "location": "[parameters('location')]",
+            "tags": "[variables('tags')]",
+            "properties": {
+                "routes": [],
+                "disableBgpRoutePropagation": true
             }
         }
     ],
