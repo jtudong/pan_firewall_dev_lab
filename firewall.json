@@ -121,8 +121,10 @@
                     {
                         "name": "[variables('untrustPrefix')]",
                         "properties": {
-                            "addressPrefix": "10.16.91.0/24" ,
-                        "networkSecurityGroup": "[resourceId('Microsoft.Network/networkSecurityGroups',concat(variables('untrustPrefix'),'-nsg'))]",
+                            "addressPrefix": "10.16.91.0/24",
+                            "networkSecurityGroup": {
+                                "id": "[resourceId('Microsoft.Network/networkSecurityGroups',concat(variables('untrustPrefix'),'-nsg'))]"
+                            },
                             "routeTable": {
                                 "id": "[resourceId('Microsoft.Network/routeTables','firewall-untrusted-rt')]"
                             }
