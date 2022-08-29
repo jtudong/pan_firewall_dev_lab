@@ -231,7 +231,7 @@
                             "sourcePortRange": "*",
                             "destinationPortRange": "*",
                             "sourceAddressPrefix": "168.63.129.16/32",
-                            "destinationAddressPrefix": "10.117.2.0/24",
+                            "destinationAddressPrefix": "10.16.91.0/24",
                             "access": "Allow",
                             "priority": 1000,
                             "direction": "Inbound",
