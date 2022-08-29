@@ -94,7 +94,10 @@
             "name": "[variables('vnet1Name')]",
             "type": "Microsoft.Network/virtualNetworks",
             "apiVersion": "2020-11-01",
-            "dependsOn": [ "[resourceId('Microsoft.Network/networkSecurityGroups', concat(variables('mgmtPrefix'),'-nsg'))]" ],
+            "dependsOn": [ 
+                "[resourceId('Microsoft.Network/networkSecurityGroups', concat(variables('mgmtPrefix'),'-nsg'))]",
+                "[resourceId('Microsoft.Network/routeTables', 'firewall-trusted-rt')]"
+            ],
             "location": "[parameters('location')]",
             "tags": "[variables('tags')]",
             "properties": {
@@ -124,7 +127,10 @@
                         "name": "[variables('trustPrefix')]",
                         "properties": {
                             "addressPrefix": "10.16.92.0/24" /* ,
-                        "networkSecurityGroup": "" */
+                        "networkSecurityGroup": "" */,
+                        "routeTable": {
+                            "id": "[resourceId('Microsoft.Network/routeTables','firewall-trusted-rt')]"
+                        }
                         }
                     }
                 ]
@@ -430,6 +436,55 @@
             "copy":{
                 "name": "paVmCopy",
                 "count": "[parameters('paCount')]"
+            }
+        },
+        {
+            // Trusted subnet route table
+            "type": "Microsoft.Network/routeTables",
+            "apiVersion": "2020-11-01",
+            "name": "firewall-trusted-rt",
+            "location": "[parameters('location')]",
+            "tags": "[variables('tags')]",
+            "properties": {
+                "disableBgpRoutePropagation": false,
+                "routes": [
+                    {
+                        "name": "internet-forced-firewall",
+                        "properties": {
+                            "addressPrefix": "0.0.0.0/0",
+                            "nextHopType": "VirtualAppliance",
+                            "nextHopIpAddress": "10.16.92.4",
+                            "hasBgpOverride": false
+                        }
+                    },
+                    {
+                        "name": "untrust-forced-firewall",
+                        "properties": {
+                            "addressPrefix": "10.16.91.0/24",
+                            "nextHopType": "VirtualAppliance",
+                            "nextHopIpAddress": "10.16.92.4",
+                            "hasBgpOverride": false
+                        }
+                    }/* ,
+                    {
+                        "name": "vpngw-forced-firewall",
+                        "properties": {
+                            "addressPrefix": "10.0.0.0/8",
+                            "nextHopType": "VirtualAppliance",
+                            "nextHopIpAddress": "10.17.3.4",
+                            "hasBgpOverride": false
+                        }
+                    },
+                    {
+                        "name": "vpngw-forced-firewall2",
+                        "properties": {
+                            "addressPrefix": "172.16.0.0/12",
+                            "nextHopType": "VirtualAppliance",
+                            "nextHopIpAddress": "10.17.3.4",
+                            "hasBgpOverride": false
+                        }
+                    } */
+                ]
             }
         }
     ],
