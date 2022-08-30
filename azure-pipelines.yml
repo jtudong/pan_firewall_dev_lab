@@ -24,7 +24,7 @@ jobs:
         scriptLocation: 'inlineScript'
         inlineScript: 'az vm image terms accept --urn paloaltonetworks:vmseries1:byol:9.1.0'
         failOnStandardError: true
-  - job: armTemplateDeployment
+  - job: armTemplateDeploymentFirewall
     dependsOn: acceptTerms
     steps:
       - task: AzureResourceManagerTemplateDeployment@3
@@ -40,13 +40,3 @@ jobs:
           csmParametersFile: 'firewall-parameters.json'
           deploymentMode: 'Incremental'
           overrideParameters: '-adminPassword $(adminPassword)'
-  - job: cancelTerms
-    dependsOn: armTemplateDeployment
-    steps:
-      - task: AzureCLI@2
-        inputs:
-          azureSubscription: 'pan-firewall-dev-lab-vs_sandbox'
-          scriptType: 'bash'
-          scriptLocation: 'inlineScript'
-          inlineScript: 'az vm image terms cancel --urn paloaltonetworks:vmseries1:byol:9.1.0'
-          failOnStandardError: true
