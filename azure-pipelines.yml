@@ -24,9 +24,10 @@ jobs:
         scriptLocation: 'inlineScript'
         inlineScript: 'az vm image terms accept --urn paloaltonetworks:vmseries1:byol:9.1.0'
         failOnStandardError: true
-  - job: armTemplateDeploymentFirewall
+  - job: armTemplateDeployment
     dependsOn: acceptTerms
     steps:
+      # Deploy firewall
       - task: AzureResourceManagerTemplateDeployment@3
         inputs:
           deploymentScope: 'Resource Group'
@@ -40,3 +41,18 @@ jobs:
           csmParametersFile: 'firewall-parameters.json'
           deploymentMode: 'Incremental'
           overrideParameters: '-adminPassword $(adminPassword)'
+      # Deploy server
+      - task: AzureResourceManagerTemplateDeployment@3
+        inputs:
+          deploymentScope: 'Resource Group'
+          azureResourceManagerConnection: 'pan-firewall-dev-lab-vs_sandbox'
+          subscriptionId: '6081cfb9-7cb9-4b84-8be8-337fdcac59f6'
+          action: 'Create Or Update Resource Group'
+          resourceGroupName: 'firewall-sandbox-rg'
+          location: 'West US 3'
+          templateLocation: 'Linked artifact'
+          csmFile: 'server.json'
+          csmParametersFile: 'server-parameters.json'
+          deploymentMode: 'Incremental'
+          overrideParameters: '-adminPassword $(adminPassword)'
+          
