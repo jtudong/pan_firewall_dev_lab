@@ -29,14 +29,8 @@
         "osDiskType": {
             "value": "Premium_LRS"
         },
-        "osDiskDeleteOption": {
-            "value": "Delete"
-        },
         "virtualMachineSize": {
             "value": "Standard_B2s"
-        },
-        "nicDeleteOption": {
-            "value": "Detach"
         },
         "adminUsername": {
             "value": "azureuser"
