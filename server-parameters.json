@@ -5,7 +5,7 @@
         "location": {
             "value": "westus3"
         },
-        "networkInterfaceName1": {
+        "networkInterfaceName": {
             "value": "aw3lfwtestsrv-nic"
         },
         "subnetName": {

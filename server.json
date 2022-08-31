@@ -23,7 +23,7 @@
         "location": {
             "type": "string"
         },
-        "networkInterfaceName1": {
+        "networkInterfaceName": {
             "type": "string"
         } /* ,
         "virtualMachineName": {
@@ -76,6 +76,12 @@
         }
     },
     "variables": {
+        "tags": {
+            "Department": "it",
+            "Team": "networking",
+            "Environment": "sandbox",
+            "Application": "network"
+        },
         "uniqueId": "[uniqueString(resourceGroup().id)]",
         "vnetId": "[parameters('virtualNetworkId')]",
         //"vnetName": "[last(split(variables('vnetId'), '/'))]",
@@ -83,11 +89,14 @@
     },
     "resources": [
         {
-            "name": "[parameters('networkInterfaceName1')]",
+            //    network interface
+            //
+            "name": "[parameters('networkInterfaceName')]",
             "type": "Microsoft.Network/networkInterfaces",
             "apiVersion": "2020-11-01",
-            "condition": false,
+            "condition": true,
             "location": "[parameters('location')]",
+            "tags": "[variables('tags')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Network/publicIpAddresses', concat(parameters('virtualMachineName'),'-pip'))]"
             ],
@@ -117,6 +126,7 @@
             "apiVersion": "2020-08-01",
             "condition": true,
             "location": "[parameters('location')]",
+            "tags": "[variables('tags')]",
             "properties": {
                 "publicIpAllocationMethod": "[parameters('publicIpAddressType')]",
                 "dnsSettings": {
@@ -137,7 +147,7 @@
             "condition": false,
             "location": "[parameters('location')]",
             "dependsOn": [
-                "[concat('Microsoft.Network/networkInterfaces/', parameters('networkInterfaceName1'))]"
+                "[concat('Microsoft.Network/networkInterfaces/', parameters('networkInterfaceName'))]"
             ],
             "properties": {
                 "hardwareProfile": {
@@ -161,7 +171,7 @@
                 "networkProfile": {
                     "networkInterfaces": [
                         {
-                            "id": "[resourceId('Microsoft.Network/networkInterfaces', parameters('networkInterfaceName1'))]",
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', parameters('networkInterfaceName'))]",
                             "properties": {
                                 "deleteOption": "Delete"
                             }
