@@ -585,7 +585,7 @@
                 "routes": [],
                 "disableBgpRoutePropagation": true
             }
-        },
+        }/* ,
         {
             "type": "Microsoft.DevTestLab/schedules",
             "apiVersion": "2018-09-15",
@@ -598,19 +598,21 @@
                 "status": "Enabled",
                 "taskType": "ComputeVmShutdownTask",
                 "dailyRecurrence": {
-                    "time": "01:00"
+                    "time": "19:00"
                 },
-                "timeZoneId": "UTC",
+                "timeZoneId": "US Mountain Standard Time",
                 "targetResourceId": "[resourceId('Microsoft.Compute/virtualMachines',concat(parameters('fwName'),copyIndex(1)))]",
                 "notificationSettings": {
-                    "status": "Disabled"
+                    "status": "Disabled",
+                    "notificationLocale": "en",
+                    "timeInMinutes": 30
                 }
             },
             "copy": {
                 "name": "paVmCopy",
                 "count": "[parameters('paCount')]"
             }
-        }
+        } */
     ],
     "outputs": {
         "username1": {
