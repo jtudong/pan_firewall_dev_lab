@@ -488,7 +488,8 @@
                             "storageAccountType": "Standard_LRS"
                         },
                         "caching": "ReadWrite",
-                        "createOption": "FromImage"
+                        "createOption": "FromImage",
+                        "deleteOption": "Delete"
                     }
                 },
                 "networkProfile": {
@@ -584,7 +585,34 @@
                 "routes": [],
                 "disableBgpRoutePropagation": true
             }
-        }
+        }/* ,
+        {
+            "type": "Microsoft.DevTestLab/schedules",
+            "apiVersion": "2018-09-15",
+            "name": "[concat('shutdown-',parameters('fwName'),copyIndex(1))]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Compute/virtualMachines', concat(parameters('fwName'),copyIndex(1)))]"
+            ],
+            "properties": {
+                "status": "Enabled",
+                "taskType": "ComputeVmShutdownTask",
+                "dailyRecurrence": {
+                    "time": "19:00"
+                },
+                "timeZoneId": "US Mountain Standard Time",
+                "targetResourceId": "[resourceId('Microsoft.Compute/virtualMachines',concat(parameters('fwName'),copyIndex(1)))]",
+                "notificationSettings": {
+                    "status": "Disabled",
+                    "notificationLocale": "en",
+                    "timeInMinutes": 30
+                }
+            },
+            "copy": {
+                "name": "paVmCopy",
+                "count": "[parameters('paCount')]"
+            }
+        } */
     ],
     "outputs": {
         "username1": {
