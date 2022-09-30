@@ -33,7 +33,7 @@
             "value": "Standard_B2s"
         },
         "adminUsername": {
-            "value": "azureuser"
+            "value": "sfcadmin"
         },
         "autoShutdownStatus": {
             "value": "Enabled"
