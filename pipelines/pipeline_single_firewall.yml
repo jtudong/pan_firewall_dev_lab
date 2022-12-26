@@ -13,7 +13,7 @@ variables:
 - group: firewall-vars-1
 
 stages:
-- stage: create-subnet
+- stage: validate
   jobs:
     - job: testResourceGroup
       steps:
