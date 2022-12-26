@@ -1,0 +1,19 @@
+resources:
+  pipelines:
+  - pipeline: main
+    source: pipeline_main
+
+parameters:
+  - name: azureServicePrincipal
+    displayName: Azure Service Principal
+    type: string
+    default:  pan-firewall-dev-lab
+
+variables:
+- group: firewall-vars-1
+
+- script: |
+    echo 'environment = '$(environment)
+    echo 'location = '$(location)
+    echo 'deployFirewall = '$(deployFirewall)
+
