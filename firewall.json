@@ -2,76 +2,27 @@
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "adminPassword": {
-            "type": "securestring",
-            "defaultValue": ""
-        },
-        "adminUsername": {
-            "type": "string",
-            "defaultValue": "sfcadmin"
-        },
         "environment": {
             "type": "string",
-            "defaultValue": "",
+            "defaultValue": "dev",
             "allowedValues": [
                 "prod",
                 "dev",
                 "sandbox"
             ]
         },
-        "fwName": {
-            "type": "string",
-            "defaultValue": "aw3lpalsfw"
-        },
         "location": {
             "type": "string",
-            "defaultValue": ""
-        },
-        "paCount": {
-            "type": "int",
-            "defaultValue": 1,
-            "minValue": 1
-        },
-        "paSku": {
-            "type": "string",
-            "defaultValue": "byol",
+            "defaultValue": "westus3",
             "allowedValues": [
-                "byol",
-                "bundle1",
-                "bundle2"
+                "westus",
+                "westus2",
+                "westus3"
             ]
-        },
-        "paVersion": {
-            "type": "string",
-            "allowedValues": [
-                "9.0.9",
-                "9.1.0",
-                "10.0.9",
-                "10.1.6",
-                "latest"
-            ],
-            "defaultValue": "9.1.0"
         },
         "subnetPrefix": {
             "type": "string",
             "defaultValue": ""
-        },
-        "vmProduct": {
-            "type": "string",
-            "defaultValue": "vmseries1",
-            "allowedValues": [
-                "vmseries1",
-                "vmseries-flex"
-            ]
-        },
-        "vmSize": {
-            "type": "string",
-            "defaultValue": "Standard_DS3_v2",
-            "allowedValues": [
-                "Standard_DS3_v2",
-                "Standard_DS4_v2",
-                "Standard_DS5_v2"
-            ]
         }
     },
     "functions": [],
@@ -82,106 +33,28 @@
             "Environment": "[parameters('environment')]",
             "Application": "[parameters('subnetPrefix')]"
         },
-        "uniqueId": "[uniqueString(resourceGroup().id)]",
-        "vnet1Name": "[concat(parameters('subnetPrefix'),'-',parameters('environment'),'-vnet')]",
-        "mgmtPrefix": "[concat('firewall-management-',parameters('environment'))]",
-        "untrustPrefix": "[concat('firewall-untrusted-',parameters('environment'))]",
-        "trustPrefix": "[concat('firewall-trusted-',parameters('environment'))]"
+        "mgmtPrefix": "[concat(parameters('subnetPrefix'),'-management')]"
     },
     "resources": [
         {
-            // create the vnet
-            "name": "[variables('vnet1Name')]",
-            "type": "Microsoft.Network/virtualNetworks",
-            "apiVersion": "2020-11-01",
-            "dependsOn": [
-                "[resourceId('Microsoft.Network/networkSecurityGroups', concat(variables('mgmtPrefix'),'-nsg'))]",
-                "[resourceId('Microsoft.Network/networkSecurityGroups', concat(variables('untrustPrefix'),'-nsg'))]",
-                "[resourceId('Microsoft.Network/routeTables', 'firewall-trusted-rt')]",
-                "[resourceId('Microsoft.Network/routeTables','firewall-untrusted-rt')]"
-            ],
-            "location": "[parameters('location')]",
-            "tags": "[variables('tags')]",
-            "properties": {
-                "addressSpace": {
-                    "addressPrefixes": [
-                        "10.16.0.0/16"
-                    ]
-                },
-                "subnets": [
-                    {
-                        "name": "[variables('mgmtPrefix')]",
-                        "properties": {
-                            "addressPrefix": "10.16.90.0/24",
-                            "networkSecurityGroup": {
-                                "id": "[resourceId('Microsoft.Network/networkSecurityGroups',concat(variables('mgmtPrefix'),'-nsg'))]"
-                            }
-                        }
-                    },
-                    {
-                        "name": "[variables('untrustPrefix')]",
-                        "properties": {
-                            "addressPrefix": "10.16.91.0/24",
-                            "networkSecurityGroup": {
-                                "id": "[resourceId('Microsoft.Network/networkSecurityGroups',concat(variables('untrustPrefix'),'-nsg'))]"
-                            },
-                            "routeTable": {
-                                "id": "[resourceId('Microsoft.Network/routeTables','firewall-untrusted-rt')]"
-                            }
-                        }
-                    },
-                    {
-                        "name": "[variables('trustPrefix')]",
-                        "properties": {
-                            "addressPrefix": "10.16.92.0/24" /* ,
-                        "networkSecurityGroup": "" */,
-                            "routeTable": {
-                                "id": "[resourceId('Microsoft.Network/routeTables','firewall-trusted-rt')]"
-                            }
-                        }
-                    }
-                ]
-            }
-        },
-        {
             //  management NSG
+            "name": "[concat(variables('mgmtPrefix'),'-',parameters('environment'),'-nsg')]",
             "type": "Microsoft.Network/networkSecurityGroups",
             "apiVersion": "2020-11-01",
-            //"name": "firewall-management-sandbox-nsg",
-            "name": "[concat(variables('mgmtPrefix'),'-nsg')]",
-            "location": "westus3",
+            "tags": "[variables('tags')]",
+            "location": "[parameters('location')]",
             "properties": {
                 "securityRules": [
                     {
-                        "name": "AllowGlobalProtect",
-                        "properties": {
-                            "protocol": "TCP",
-                            "sourcePortRange": "*",
-                            "sourceAddressPrefix": "10.10.24.0/24",
-                            "destinationAddressPrefix": "*",
-                            "access": "Allow",
-                            "priority": 1200,
-                            "direction": "Inbound",
-                            "sourcePortRanges": [],
-                            "destinationPortRanges": [
-                                "22",
-                                "443"
-                            ],
-                            "sourceAddressPrefixes": [],
-                            "destinationAddressPrefixes": []
-                        }
-                    },
-                    {
                         "name": "AllowManagementInbound",
                         "properties": {
-                            "description": "AllowManagementInbound",
+                            "description": "Allow Management Inbound",
+                            "direction": "Inbound",
                             "protocol": "*",
                             "sourcePortRange": "*",
                             "destinationAddressPrefix": "*",
                             "access": "Allow",
-                            "priority": 1300,
-                            "direction": "Inbound",
-                            "sourcePortRanges": [],
+                            "priority": 1000,
                             "destinationPortRanges": [
                                 "22",
                                 "443"
@@ -189,22 +62,23 @@
                             "sourceAddressPrefixes": [
                                 "63.156.58.20/32",
                                 "4.1.98.242/32",
-                                "72.208.101.143/32"
-                            ],
-                            "destinationAddressPrefixes": []
+                                "72.208.101.143/32",
+                                "10.10.24.0/24"
+                            ]
                         }
                     },
                     {
                         "name": "DenyAllInBound",
                         "properties": {
+                            "description": "Deny All Inbound",
+                            "direction": "Inbound",
                             "protocol": "*",
                             "sourcePortRange": "*",
                             "destinationPortRange": "*",
                             "sourceAddressPrefix": "*",
                             "destinationAddressPrefix": "*",
                             "access": "Deny",
-                            "priority": 1400,
-                            "direction": "Inbound",
+                            "priority": 4096,
                             "sourcePortRanges": [],
                             "destinationPortRanges": [],
                             "sourceAddressPrefixes": [],
@@ -213,419 +87,7 @@
                     }
                 ]
             }
-        },
-        {
-            // untrust NSG
-            "type": "Microsoft.Network/networkSecurityGroups",
-            "apiVersion": "2020-11-01",
-            "name": "[concat(variables('untrustPrefix'),'-nsg')]",
-            "location": "westus3",
-            "properties": {
-                "securityRules": [
-                    {
-                        "name": "AllowAzureHealthProbeInBound",
-                        "type": "Microsoft.Network/networkSecurityGroups/securityRules",
-                        "properties": {
-                            "description": "AllowAzureHealthProbeInBound",
-                            "protocol": "*",
-                            "sourcePortRange": "*",
-                            "destinationPortRange": "*",
-                            "sourceAddressPrefix": "168.63.129.16/32",
-                            "destinationAddressPrefix": "10.16.91.0/24",
-                            "access": "Allow",
-                            "priority": 1000,
-                            "direction": "Inbound",
-                            "sourcePortRanges": [],
-                            "destinationPortRanges": [],
-                            "sourceAddressPrefixes": [],
-                            "destinationAddressPrefixes": []
-                        }
-                    },
-                    {
-                        "name": "Allow443And80InBound",
-                        "type": "Microsoft.Network/networkSecurityGroups/securityRules",
-                        "properties": {
-                            "description": "Allow443And80InBound",
-                            "protocol": "*",
-                            "sourcePortRange": "*",
-                            "sourceAddressPrefix": "*",
-                            "destinationAddressPrefix": "*",
-                            "access": "Allow",
-                            "priority": 1100,
-                            "direction": "Inbound",
-                            "sourcePortRanges": [],
-                            "destinationPortRanges": [
-                                "443",
-                                "80"
-                            ],
-                            "sourceAddressPrefixes": [],
-                            "destinationAddressPrefixes": []
-                        }
-                    },
-                    {
-                        "name": "DenyAnyInBound",
-                        "type": "Microsoft.Network/networkSecurityGroups/securityRules",
-                        "properties": {
-                            "description": "DenyAnyInBound",
-                            "protocol": "*",
-                            "sourcePortRange": "*",
-                            "destinationPortRange": "*",
-                            "sourceAddressPrefix": "*",
-                            "destinationAddressPrefix": "*",
-                            "access": "Deny",
-                            "priority": 1200,
-                            "direction": "Inbound",
-                            "sourcePortRanges": [],
-                            "destinationPortRanges": [],
-                            "sourceAddressPrefixes": [],
-                            "destinationAddressPrefixes": []
-                        }
-                    },
-                    {
-                        "name": "DenyToVnetOutbound",
-                        "type": "Microsoft.Network/networkSecurityGroups/securityRules",
-                        "properties": {
-                            "description": "DenyToVnetOutbound",
-                            "protocol": "*",
-                            "sourcePortRange": "*",
-                            "destinationPortRange": "*",
-                            "sourceAddressPrefix": "*",
-                            "destinationAddressPrefix": "10.16.0.0/16",
-                            "access": "Deny",
-                            "priority": 1000,
-                            "direction": "Outbound",
-                            "sourcePortRanges": [],
-                            "destinationPortRanges": [],
-                            "sourceAddressPrefixes": [],
-                            "destinationAddressPrefixes": []
-                        }
-                    }
-                ]
-            }
-        },
-        {
-            // trust NSG
-            "type": "Microsoft.Network/networkSecurityGroups",
-            "apiVersion": "2020-11-01",
-            "name": "[concat(variables('trustPrefix'),'-nsg')]",
-            "location": "westus3",
-            "properties": {
-                "securityRules": []
-            }
-        },
-        {
-            // management PIP
-            "name": "[concat(variables('mgmtPrefix'),copyIndex(1),'-pip')]",
-            "comments": "index for number of firewalls",
-            "type": "Microsoft.Network/publicIPAddresses",
-            "apiVersion": "2020-11-01",
-            "location": "[parameters('location')]",
-            "tags": "[variables('tags')]",
-            "sku": {
-                "name": "Basic"
-            },
-            "properties": {
-                "publicIPAllocationMethod": "Dynamic",
-                "dnsSettings": {
-                    "domainNameLabel": "[concat('fw',copyIndex(1),'management', variables('uniqueId'))]"
-                }
-            },
-            "copy": {
-                "name": "managementPIPCopy",
-                "count": "[parameters('paCount')]"
-            }
-        },
-        {
-            // untrust PIP
-            "name": "[concat(variables('untrustPrefix'),copyIndex(1),'-pip')]",
-            "comments": "index for number of firewalls",
-            "type": "Microsoft.Network/publicIPAddresses",
-            "apiVersion": "2020-11-01",
-            "location": "[parameters('location')]",
-            "tags": "[variables('tags')]",
-            "sku": {
-                "name": "Basic"
-            },
-            "properties": {
-                "publicIPAllocationMethod": "Dynamic",
-                "dnsSettings": {
-                    "domainNameLabel": "[concat('fw',copyIndex(1),'untrust', variables('uniqueId'))]"
-                }
-            },
-            "copy": {
-                "name": "untrustPIPCopy",
-                "count": "[parameters('paCount')]"
-            }
-        },
-        {
-            // create the Management NIC
-            "name": "[concat(variables('mgmtPrefix'),copyIndex(1),'-nic')]",
-            "type": "Microsoft.Network/networkInterfaces",
-            "apiVersion": "2020-11-01",
-            "location": "[parameters('location')]",
-            "tags": "[variables('tags')]",
-            "dependsOn": [
-                "[resourceId('Microsoft.Network/publicIPAddresses',concat(variables('mgmtPrefix'),copyIndex(1),'-pip'))]",
-                "[resourceId('Microsoft.Network/networkSecurityGroups', concat(variables('mgmtPrefix'),'-nsg'))]",
-                "[resourceId('Microsoft.Network/virtualNetworks', variables('vnet1Name'))]"
-            ],
-            "properties": {
-                "ipConfigurations": [
-                    {
-                        "name": "[concat(variables('mgmtPrefix'),copyIndex(1))]",
-                        "properties": {
-                            "privateIPAllocationMethod": "Dynamic",
-                            "publicIPAddress": {
-                                "id": "[resourceId('Microsoft.Network/publicIPAddresses',concat(variables('mgmtPrefix'),copyIndex(1),'-pip'))]"
-                            },
-                            "subnet": {
-                                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vnet1Name'), variables('mgmtPrefix'))]"
-                            }
-                        }
-                    }
-                ]
-            },
-            "copy": {
-                "name": "managementNICCopy",
-                "count": "[parameters('paCount')]"
-            }
-        },
-        {
-            // create the Untrusted NIC
-            "name": "[concat(variables('untrustPrefix'),copyIndex(1),'-nic')]",
-            "type": "Microsoft.Network/networkInterfaces",
-            "apiVersion": "2020-11-01",
-            "location": "[parameters('location')]",
-            "tags": "[variables('tags')]",
-            "dependsOn": [
-                "[resourceId('Microsoft.Network/publicIPAddresses',concat(variables('untrustPrefix'),copyIndex(1),'-pip'))]",
-                "[resourceId('Microsoft.Network/networkSecurityGroups', concat(variables('untrustPrefix'),'-nsg'))]",
-                "[resourceId('Microsoft.Network/virtualNetworks', variables('vnet1Name'))]"
-            ],
-            "properties": {
-                "ipConfigurations": [
-                    {
-                        "name": "ipConfig1",
-                        "properties": {
-                            "privateIPAllocationMethod": "Dynamic",
-                            "publicIPAddress": {
-                                "id": "[resourceId('Microsoft.Network/publicIPAddresses',concat(variables('untrustPrefix'),copyIndex(1),'-pip'))]"
-                            },
-                            "subnet": {
-                                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vnet1Name'), variables('untrustPrefix'))]"
-                            }
-                        }
-                    }
-                ]
-            },
-            "copy": {
-                "name": "untrustedNICCopy",
-                "count": "[parameters('paCount')]"
-            }
-        },
-        {
-            // create the Trusted NIC
-            "name": "[concat(variables('trustPrefix'),copyIndex(1),'-nic')]",
-            "type": "Microsoft.Network/networkInterfaces",
-            "apiVersion": "2020-11-01",
-            "location": "[parameters('location')]",
-            "tags": "[variables('tags')]",
-            "dependsOn": [
-                "[resourceId('Microsoft.Network/networkSecurityGroups', concat(variables('trustPrefix'),'-nsg'))]",
-                "[resourceId('Microsoft.Network/virtualNetworks', variables('vnet1Name'))]"
-            ],
-            "properties": {
-                "ipConfigurations": [
-                    {
-                        "name": "ipConfig1",
-                        "properties": {
-                            "privateIPAllocationMethod": "Dynamic",
-                            "subnet": {
-                                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vnet1Name'), variables('trustPrefix'))]"
-                            }
-                        }
-                    }
-                ]
-            },
-            "copy": {
-                "name": "trustedNICCopy",
-                "count": "[parameters('paCount')]"
-            }
-        },
-        {
-            // create the firewall VM
-            "apiVersion": "2021-03-01",
-            "type": "Microsoft.Compute/virtualMachines",
-            "name": "[concat(parameters('fwName'),copyIndex(1))]",
-            "condition": true,
-            "location": "[parameters('location')]",
-            "tags": "[variables('tags')]",
-            //"dependsOn": []
-            "plan": {
-                "name": "[parameters('paSku')]",
-                "product": "[parameters('vmProduct')]",
-                "publisher": "paloaltonetworks"
-            },
-            "properties": {
-                "hardwareProfile": {
-                    "vmSize": "[parameters('vmSize')]"
-                },
-                "osProfile": {
-                    "computerName": "[concat(parameters('fwName'),copyIndex(1))]",
-                    "adminUsername": "[parameters('adminUsername')]",
-                    "adminPassword": "[parameters('adminPassword')]"
-                },
-                "storageProfile": {
-                    "imageReference": {
-                        "publisher": "paloaltonetworks",
-                        "offer": "[parameters('vmProduct')]",
-                        "sku": "[parameters('paSku')]",
-                        "version": "[parameters('paVersion')]"
-                    },
-                    "osDisk": {
-                        "name": "[concat(parameters('fwName'),copyIndex(1),'-OSDisk')]",
-                        "managedDisk": {
-                            "storageAccountType": "Standard_LRS"
-                        },
-                        "caching": "ReadWrite",
-                        "createOption": "FromImage",
-                        "deleteOption": "Delete"
-                    }
-                },
-                "networkProfile": {
-                    "networkInterfaces": [
-                        {
-                            "id": "[resourceId('Microsoft.Network/networkInterfaces',concat(variables('mgmtPrefix'),copyIndex(1),'-nic'))]",
-                            "properties": {
-                                "primary": true
-                            }
-                        },
-                        {
-                            "id": "[resourceId('Microsoft.Network/networkInterfaces',concat(variables('untrustPrefix'),copyIndex(1),'-nic'))]",
-                            "properties": {
-                                "primary": false
-                            }
-                        },
-                        {
-                            "id": "[resourceId('Microsoft.Network/networkInterfaces',concat(variables('trustPrefix'),copyIndex(1),'-nic'))]",
-                            "properties": {
-                                "primary": false
-                            }
-                        }
-                    ]
-                }
-            },
-            "dependsOn": [
-                "[resourceId('Microsoft.Network/networkInterfaces',concat(variables('trustPrefix'),copyIndex(1),'-nic'))]",
-                "[resourceId('Microsoft.Network/networkInterfaces', concat(variables('trustPrefix'),copyIndex(1),'-nic'))]",
-                "[resourceId('Microsoft.Network/networkInterfaces', concat(variables('untrustPrefix'),copyIndex(1),'-nic'))]"
-            ],
-            "copy": {
-                "name": "paVmCopy",
-                "count": "[parameters('paCount')]"
-            }
-        },
-        {
-            // Trusted subnet route table
-            "type": "Microsoft.Network/routeTables",
-            "apiVersion": "2020-11-01",
-            "name": "firewall-trusted-rt",
-            "location": "[parameters('location')]",
-            "tags": "[variables('tags')]",
-            "properties": {
-                "disableBgpRoutePropagation": false,
-                "routes": [
-                    {
-                        "name": "internet-forced-firewall",
-                        "properties": {
-                            "addressPrefix": "0.0.0.0/0",
-                            "nextHopType": "VirtualAppliance",
-                            "nextHopIpAddress": "10.16.92.4",
-                            "hasBgpOverride": false
-                        }
-                    },
-                    {
-                        "name": "untrust-forced-firewall",
-                        "properties": {
-                            "addressPrefix": "10.16.91.0/24",
-                            "nextHopType": "VirtualAppliance",
-                            "nextHopIpAddress": "10.16.92.4",
-                            "hasBgpOverride": false
-                        }
-                    } /* ,
-                    {
-                        "name": "vpngw-forced-firewall",
-                        "properties": {
-                            "addressPrefix": "10.0.0.0/8",
-                            "nextHopType": "VirtualAppliance",
-                            "nextHopIpAddress": "10.17.3.4",
-                            "hasBgpOverride": false
-                        }
-                    },
-                    {
-                        "name": "vpngw-forced-firewall2",
-                        "properties": {
-                            "addressPrefix": "172.16.0.0/12",
-                            "nextHopType": "VirtualAppliance",
-                            "nextHopIpAddress": "10.17.3.4",
-                            "hasBgpOverride": false
-                        }
-                    } */
-                ]
-            }
-        },
-        {
-            // Unrusted subnet route table
-            "type": "Microsoft.Network/routeTables",
-            "apiVersion": "2020-11-01",
-            "name": "firewall-untrusted-rt",
-            "location": "[parameters('location')]",
-            "tags": "[variables('tags')]",
-            "properties": {
-                "routes": [],
-                "disableBgpRoutePropagation": true
-            }
-        }/* ,
-        {
-            "type": "Microsoft.DevTestLab/schedules",
-            "apiVersion": "2018-09-15",
-            "name": "[concat('shutdown-',parameters('fwName'),copyIndex(1))]",
-            "location": "[parameters('location')]",
-            "dependsOn": [
-                "[resourceId('Microsoft.Compute/virtualMachines', concat(parameters('fwName'),copyIndex(1)))]"
-            ],
-            "properties": {
-                "status": "Enabled",
-                "taskType": "ComputeVmShutdownTask",
-                "dailyRecurrence": {
-                    "time": "19:00"
-                },
-                "timeZoneId": "US Mountain Standard Time",
-                "targetResourceId": "[resourceId('Microsoft.Compute/virtualMachines',concat(parameters('fwName'),copyIndex(1)))]",
-                "notificationSettings": {
-                    "status": "Disabled",
-                    "notificationLocale": "en",
-                    "timeInMinutes": 30
-                }
-            },
-            "copy": {
-                "name": "paVmCopy",
-                "count": "[parameters('paCount')]"
-            }
-        } */
-    ],
-    "outputs": {
-        "username1": {
-            "type": "string",
-            "value": "[reference(concat(resourceId('Microsoft.Compute/virtualMachines',parameters('fwName')),'1')).osProfile.adminUsername]"
-        },
-        "vnetName": {
-            "type": "string",
-            "value": "[resourceId('Microsoft.Network/virtualNetworks',variables('vnet1Name'))]"
-        },
-        "trustedSubnetName": {
-            "type": "string",
-            "value": "[resourceId('Microsoft.Network/virtualNetworks/subnets',variables('vnet1Name'),variables('trustPrefix'))]"
         }
-    }
+    ],
+    "outputs": {}
 }
