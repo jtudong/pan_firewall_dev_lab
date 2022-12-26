@@ -14,7 +14,7 @@ parameters:
   - name: azureServicePrincipal
     displayName: Azure Service Principal
     type: string
-    default:  jtudong-pan-firewall-sandbox
+    default:  pan-firewall-dev-lab
 
 variables:
 - group: firewall-vars-1
