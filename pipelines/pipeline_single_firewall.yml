@@ -19,6 +19,7 @@ stages:
       steps:
         - task: AzureCLI@2
           inputs:
+            connectedServiceNameARM: ${{ parameters.azureServicePrincipal }}
             scriptType:  bash
             scriptLocation: inlineScript
             inlineScript: az group exists -n sfc-network-dev-rg- # test failure
