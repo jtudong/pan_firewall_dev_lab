@@ -9,6 +9,7 @@ trigger:
       - docs/README.md
       - "config/*"
       - "license/*"
+      - "*.azcli"
 
 parameters:
   - name: azureServicePrincipal
