@@ -12,6 +12,7 @@ parameters:
 variables:
 - group: firewall-vars-1
 
+steps:
 - script: |
     echo 'subnetPrefix = '$(subnetPrefix)
     echo 'environment = '$(environment)
