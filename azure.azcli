@@ -1,0 +1,6 @@
+az group list -o table | grep firewall
+
+# detach the nsg and route-table
+az network vnet subnet update --nsg "" -g sfc-fwtest-sandbox-rg --vnet-name sfc01-wu3-dev-vnet -n dev-fwtest
+az network vnet subnet update --route-table "" -g sfc-fwtest-sandbox-rg --vnet-name sfc01-wu3-dev-vnet -n dev-fwtest
+
