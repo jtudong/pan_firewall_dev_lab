@@ -375,6 +375,9 @@
                             "type": "Microsoft.Network/virtualNetworks/subnets",
                             "apiVersion": "2020-11-01",
                             "name": "[format('{0}/{1}', parameters('existingVNETName'), concat(variables('trustPrefix')))]",
+                            "dependsOn": [
+                                "[resourceId('Microsoft.Network/virtualNetworks/subnets', format('{0}/{1}', parameters('existingVNETName'), concat(variables('mgmtPrefix'))))]"
+                            ],
                             "properties": {
                                 "addressPrefix": "10.16.3.0/24"
                             }
@@ -383,6 +386,9 @@
                             "type": "Microsoft.Network/virtualNetworks/subnets",
                             "apiVersion": "2020-11-01",
                             "name": "[format('{0}/{1}', parameters('existingVNETName'), concat(variables('untrustPrefix')))]",
+                            "dependsOn": [
+                                "[resourceId('Microsoft.Network/virtualNetworks/subnets', format('{0}/{1}', parameters('existingVNETName'), concat(variables('trustPrefix'))))]"
+                            ],
                             "properties": {
                                 "addressPrefix": "10.16.2.0/24"
                             }
