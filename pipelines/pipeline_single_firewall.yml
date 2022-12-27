@@ -2,7 +2,7 @@ resources:
   pipelines:
   - pipeline: main
     source: pipeline_main
-    trigger: true
+    trigger: 
 
 parameters:
   - name: azureServicePrincipal

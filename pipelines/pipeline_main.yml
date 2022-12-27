@@ -2,7 +2,7 @@ trigger:
   branches:
     include:
       - development
-      - master
+      #- master
   paths:
     exclude:
       - "pipelines/*.yml"

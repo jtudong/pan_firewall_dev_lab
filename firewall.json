@@ -283,6 +283,61 @@
                     "domainNameLabel": "[if(not(empty(variables('untrustPrefix'))),json(concat('\"',variables('untrustPrefix'),'\"')),concat('fwuntrust', variables('uniqueId')))]"
                 }
             }
+        },
+        {
+            // Trusted subnet route table
+            "name": "[concat(parameters('subnetPrefix'),'-trusted-rt')]",
+            "type": "Microsoft.Network/routeTables",
+            "apiVersion": "2020-11-01",
+            "tags": "[variables('tags')]",
+            "location": "[parameters('location')]",
+            "properties": {
+                "disableBgpRoutePropagation": false,
+                "routes": [
+                    {
+                        "name": "internet-forced-firewall",
+                        "properties": {
+                            "addressPrefix": "0.0.0.0/0",
+                            "nextHopType": "VirtualAppliance",
+                            "nextHopIpAddress": "10.16.92.4",
+                            "hasBgpOverride": false
+                        }
+                    },
+                    {
+                        "name": "untrust-forced-firewall",
+                        "properties": {
+                            "addressPrefix": "10.16.91.0/24",
+                            "nextHopType": "VirtualAppliance",
+                            "nextHopIpAddress": "10.16.92.4",
+                            "hasBgpOverride": false
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            // Unrusted subnet route table
+            "name": "[concat(parameters('subnetPrefix'),'-untrusted-rt')]",
+            "type": "Microsoft.Network/routeTables",
+            "apiVersion": "2020-11-01",
+            "tags": "[variables('tags')]",
+            "location": "[parameters('location')]",
+            "properties": {
+                "routes": [],
+                "disableBgpRoutePropagation": true
+            }
+        },
+        {
+            // Management subnet route table
+            "name": "[concat(parameters('subnetPrefix'),'-management-rt')]",
+            "type": "Microsoft.Network/routeTables",
+            "apiVersion": "2020-11-01",
+            "tags": "[variables('tags')]",
+            "location": "[parameters('location')]",
+            "properties": {
+                "routes": [],
+                "disableBgpRoutePropagation": true
+            }
         }
     ],
     "outputs": {}
