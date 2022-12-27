@@ -249,6 +249,40 @@
             "properties": {
                 "securityRules": []
             }
+        },
+        {
+            // management PIP
+            "name": "[concat(variables('mgmtPrefix'),'-',parameters('environment'),'-pip')]",
+            "type": "Microsoft.Network/publicIPAddresses",
+            "apiVersion": "2020-11-01",
+            "tags": "[variables('tags')]",
+            "location": "[parameters('location')]",
+            "sku": {
+                "name": "Standard"
+            },
+            "properties": {
+                "publicIPAllocationMethod": "Static",
+                "dnsSettings": {
+                    "domainNameLabel": "[if(not(empty(variables('mgmtPrefix'))),json(concat('\"',variables('mgmtPrefix'),'\"')),concat('fwmgmt', variables('uniqueId')))]"
+                }
+            }
+        },
+        {
+            // untrust PIP
+            "name": "[concat(variables('untrustPrefix'),'-',parameters('environment'),'-pip')]",
+            "type": "Microsoft.Network/publicIPAddresses",
+            "apiVersion": "2020-11-01",
+            "tags": "[variables('tags')]",
+            "location": "[parameters('location')]",
+            "sku": {
+                "name": "Standard"
+            },
+            "properties": {
+                "publicIPAllocationMethod": "Static",
+                "dnsSettings": {
+                    "domainNameLabel": "[if(not(empty(variables('untrustPrefix'))),json(concat('\"',variables('untrustPrefix'),'\"')),concat('fwuntrust', variables('uniqueId')))]"
+                }
+            }
         }
     ],
     "outputs": {}
