@@ -4,8 +4,9 @@ resources:
     source: pipeline_main
     trigger: 
       branches:
-        include:
-          -
+        exclude:
+          - development
+          - master
 
 parameters:
   - name: azureServicePrincipal
