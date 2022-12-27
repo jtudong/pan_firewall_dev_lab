@@ -3,6 +3,9 @@ resources:
   - pipeline: main
     source: pipeline_main
     trigger: 
+      branches:
+        include:
+          -
 
 parameters:
   - name: azureServicePrincipal
