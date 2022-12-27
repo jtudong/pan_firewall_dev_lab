@@ -347,6 +347,14 @@
             "name": "subnetDeployment",
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2021-04-01",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/networkSecurityGroups', concat(variables('mgmtPrefix'),'-',parameters('environment'),'-nsg'))]",
+                "[resourceId('Microsoft.Network/networkSecurityGroups', concat(variables('trustPrefix'),'-',parameters('environment'),'-nsg'))]",
+                "[resourceId('Microsoft.Network/networkSecurityGroups', concat(variables('untrustPrefix'),'-',parameters('environment'),'-nsg'))]",
+                "[resourceId('Microsoft.Network/routeTables', concat(parameters('subnetPrefix'),'-management-rt'))]",
+                "[resourceId('Microsoft.Network/routeTables', concat(parameters('subnetPrefix'),'-trusted-rt'))]",
+                "[resourceId('Microsoft.Network/routeTables', concat(parameters('subnetPrefix'),'-untrusted-rt'))]"
+            ],
             "resourceGroup": "sfc-network-dev-rg",
             "properties": {
                 "mode": "Incremental",
