@@ -1,12 +1,16 @@
-resources:
-  pipelines:
-  - pipeline: main
-    source: pipeline_main
-    trigger: 
-      branches:
-        exclude:
-          - development
-          - master
+trigger:
+  branches:
+    include:
+      - development
+      - master
+  paths:
+    exclude:
+      - "pipelines/*.yml"
+      - docs/README.md
+      - "config/*"
+      - "license/*"
+      - "*.azcli"
+
 
 parameters:
   - name: azureServicePrincipal
@@ -18,6 +22,28 @@ variables:
 - group: firewall-vars-1
 
 stages:
+- stage: prerequisites
+  jobs:
+    - job: createResourceGroup
+      steps:
+        - task: AzureCLI@2
+          inputs:
+            connectedServiceNameARM: ${{ parameters.azureServicePrincipal }}
+            scriptType:  bash
+            scriptLocation: inlineScript
+            inlineScript:  az group create -l $(location) -n $(subnetPrefix)-$(environment)-rg
+            failOnStandardError:  true
+    - job: acceptTerms
+      dependsOn: createResourceGroup
+      steps:
+      - task: AzureCLI@2
+        inputs:
+          connectedServiceNameARM: ${{ parameters.azureServicePrincipal }}
+          scriptType:  bash
+          scriptLocation: inlineScript
+          inlineScript:  az vm image terms accept --urn paloaltonetworks:vmseries-flex:byol:10.1.6
+          failOnStandardError: true
+
 #- stage: validate
 #  jobs:
 #    - job: testResourceGroup
@@ -29,6 +55,7 @@ stages:
 #            scriptLocation: inlineScript
 #            inlineScript: az group exists -n sfc-network-dev-rg- # test failure
 #            failOnStandardError:  true
+
 - stage: createFirewall
   jobs:
     - job: deployTemplate
