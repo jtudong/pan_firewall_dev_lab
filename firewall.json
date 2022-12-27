@@ -11,6 +11,10 @@
                 "sandbox"
             ]
         },
+        "existingVNETName": {
+            "type": "string",
+            "defaultValue": "sfc01-wu3-dev-vnet"
+        },
         "location": {
             "type": "string",
             "defaultValue": "westus3",
@@ -337,6 +341,47 @@
             "properties": {
                 "routes": [],
                 "disableBgpRoutePropagation": true
+            }
+        },
+        {
+            "name": "subnetDeployment",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2021-04-01",
+            "resourceGroup": "sfc-network-dev-rg",
+            "properties": {
+                "mode": "Incremental",
+                "template": {
+                    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+                    "contentVersion": "1.0.0.0",
+                    "variables": {},
+                    "resources": [
+                        {
+                            "type": "Microsoft.Network/virtualNetworks/subnets",
+                            "apiVersion": "2020-11-01",
+                            "name": "[format('{0}/{1}', parameters('existingVNETName'), concat(variables('mgmtPrefix')))]",
+                            "properties": {
+                                "addressPrefix": "10.16.4.0/24"
+                            }
+                        },
+                        {
+                            "type": "Microsoft.Network/virtualNetworks/subnets",
+                            "apiVersion": "2020-11-01",
+                            "name": "[format('{0}/{1}', parameters('existingVNETName'), concat(variables('trustPrefix')))]",
+                            "properties": {
+                                "addressPrefix": "10.16.3.0/24"
+                            }
+                        },
+                        {
+                            "type": "Microsoft.Network/virtualNetworks/subnets",
+                            "apiVersion": "2020-11-01",
+                            "name": "[format('{0}/{1}', parameters('existingVNETName'), concat(variables('untrustPrefix')))]",
+                            "properties": {
+                                "addressPrefix": "10.16.2.0/24"
+                            }
+                        }
+                    ],
+                    "outputs": {}
+                }
             }
         }
     ],
