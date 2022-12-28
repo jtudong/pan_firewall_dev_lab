@@ -376,7 +376,8 @@
                             "apiVersion": "2020-11-01",
                             "name": "[format('{0}/{1}', parameters('existingVNETName'), concat(variables('trustPrefix')))]",
                             "dependsOn": [
-                                "[resourceId('Microsoft.Network/virtualNetworks/subnets', format('{0}/{1}', parameters('existingVNETName'), concat(variables('mgmtPrefix'))))]"
+                            //    "[resourceId('sfc-network-dev-rg','Microsoft.Network/virtualNetworks/subnets', format('{0}/{1}', parameters('existingVNETName'), concat(variables('mgmtPrefix'))))]"
+                            "/subscriptions/67b03f65-308b-456f-b4a9-572c14a374cc/resourceGroups/sfc-network-dev-rg/providers/Microsoft.Network/virtualNetworks/sfc01-wu3-dev-vnet/subnets/firewalltest-management"
                             ],
                             "properties": {
                                 "addressPrefix": "10.16.3.0/24"
@@ -387,7 +388,8 @@
                             "apiVersion": "2020-11-01",
                             "name": "[format('{0}/{1}', parameters('existingVNETName'), concat(variables('untrustPrefix')))]",
                             "dependsOn": [
-                                "[resourceId('Microsoft.Network/virtualNetworks/subnets', format('{0}/{1}', parameters('existingVNETName'), concat(variables('trustPrefix'))))]"
+                            //    "[resourceId('sfc-network-dev-rg','Microsoft.Network/virtualNetworks/subnets', format('{0}/{1}', parameters('existingVNETName'), concat(variables('trustPrefix'))))]"
+                            "/subscriptions/67b03f65-308b-456f-b4a9-572c14a374cc/resourceGroups/sfc-network-dev-rg/providers/Microsoft.Network/virtualNetworks/sfc01-wu3-dev-vnet/subnets/firewalltest-trusted"
                             ],
                             "properties": {
                                 "addressPrefix": "10.16.2.0/24"

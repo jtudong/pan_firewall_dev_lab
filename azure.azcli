@@ -1,4 +1,3 @@
-az group create -l westus3 -n sfc-firewalltest-sandbox-rg 
 az group list -o table | grep firewalltest
 
 # detach the nsg and route-table
@@ -12,5 +11,8 @@ az network vnet subnet delete -g sfc-network-dev-rg --vnet-name sfc01-wu3-dev-vn
 
 az group delete -n sfc-firewalltest-sandbox-rg --yes --no-wait
 watch 'az group list -o table | grep firewalltest'
+
+az group create -l westus3 -n sfc-firewalltest-sandbox-rg
+az deployment group create -c -g sfc-firewalltest-sandbox-rg -f firewall.json -p firewall.parameters.json 
 
 git switch master&&git merge development&&git push&&git push github&&git switch development$$gg -6
