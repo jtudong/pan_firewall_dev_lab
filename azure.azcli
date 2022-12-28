@@ -13,6 +13,6 @@ az group delete -n sfc-firewalltest-sandbox-rg --yes --no-wait
 watch 'az group list -o table | grep firewalltest'
 
 az group create -l westus3 -n sfc-firewalltest-sandbox-rg
-az deployment group create -c -g sfc-firewalltest-sandbox-rg -f firewall.json -p firewall.parameters.json 
+az deployment group create -c -g sfc-firewalltest-sandbox-rg -f firewall.json -p firewall.parameters.json -n firewalltest-12272019
 
 git switch master&&git merge development&&git push&&git push github&&git switch development$$gg -6
