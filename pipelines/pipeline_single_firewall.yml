@@ -11,6 +11,8 @@ trigger:
       - "license/*"
       - "*.azcli"
 
+pool:
+  vmImage: ubuntu-latest
 
 parameters:
   - name: azureServicePrincipal
@@ -19,7 +21,15 @@ parameters:
     default:  pan-firewall-dev-lab
 
 variables:
-- group: firewall-vars-1
+- group: firewall-vars-1                                  # Pipeline variables
+                                                          # deployFirwall
+                                                          # environment
+                                                          # location
+                                                          # parameterFile
+                                                          # subnetPrefix
+                                                          # templateFile
+- name: varResourceGroupName
+  value: sfc-$(subnetPrefix)-$(environment)-rg
 
 stages:
 - stage: prerequisites
@@ -31,7 +41,7 @@ stages:
             connectedServiceNameARM: ${{ parameters.azureServicePrincipal }}
             scriptType:  bash
             scriptLocation: inlineScript
-            inlineScript:  az group create -l $(location) -n sfc-$(subnetPrefix)-$(environment)-rg --tags Application=network Team=networking Department=it Environment=$(environment)
+            inlineScript:  az group create -l $(location) -n $(varResourceGroupName) --tags Application=network Team=networking Department=it Environment=$(environment)
             failOnStandardError:  true
     - job: acceptTerms
       dependsOn: createResourceGroup
@@ -58,17 +68,34 @@ stages:
 
 - stage: createFirewall
   jobs:
+    - job: test_variables
+      steps:
+        - bash: |
+            echo 'bootstrapAccessKey = '$(bootstrapAccessKey)
+            echo 'deployFirewall = '$(deployFirewall)
+            echo 'environment ='$(environment)
+            edho 'location = '$(location)
+            echo 'parameterFile ='$(parameterFile)
+            echo 'subnetPrefix ='$(subnetPrefix)
+            echo 'templateFile ='$(templateFile)
+            echo 'varResourceGroupName = '$(varResourceGroupName)
+            echo 'pwd'
+            pwd
+            echo 'ls -l'
+            ls -l
+
     - job: deployTemplate
       steps:
+        - bash: echo 'Deploying the firewall'
         - task: AzureResourceManagerTemplateDeployment@3
           inputs:
-            deploymentScope: 'Resource Group'
+            deploymentScope: Resource Group
             azureResourceManagerConnection: ${{ parameters.azureServicePrincipal }}
-            action: 'Create Or Update Resource Group'
-            resourceGroupName: sfc-$(subnetPrefix)-$(environment)-rg
+            action: Create Or Update Resource Group
+            resourceGroupName: $(varResourceGroupName)
             location: $(location)
-            templateLocation: 'Linked artifact'
-            csmFile: firewall.json
-            csmParametersFile: firewall.parameters.json
-            overrideParameters: #-adminPassword $(adminPassword) -bootstrapAccessKey $(bootstrapAccessKey)
-            deploymentMode: 'Incremental'
+            templateLocation: Linked artifact
+            csmFile: $(templateFile)
+            csmParametersFile: $(parameterFile)
+            overrideParameters: -adminPassword $(adminPassword) -bootstrapAccessKey $(bootstrapAccessKey)
+            deploymentMode: Incremental
