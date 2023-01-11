@@ -97,5 +97,5 @@ stages:
             templateLocation: Linked artifact
             csmFile: $(templateFile)
             csmParametersFile: $(parameterFile)
-            overrideParameters: -adminPassword $(adminPassword) -bootstrapAccessKey $(bootstrapAccessKey)
+            overrideParameters: -adminPassword $(adminPassword) #-bootstrapAccessKey $(bootstrapAccessKey)
             deploymentMode: Incremental
