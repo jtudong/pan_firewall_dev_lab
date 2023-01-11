@@ -2,6 +2,36 @@
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
+        "adminPassword": {
+            "type": "securestring",
+            "defaultValue": "",
+            "metadata": {
+                "description": "ASSIGN THE ADMIN PASSWORD AT RUNTIME -- DO NOT SAVE IN TEMPLATE"
+            }
+        },
+        "adminUsername": {
+            "type": "string",
+            "defaultValue": "sfcadmin"
+        },
+        "bootstrapStorageAccount": {
+            "type": "string",
+            "defaultValue": ""
+        },
+        "bootstrapAccessKey": {
+            "type": "string",
+            "defaultValue": "",
+            "metadata": {
+                "description": "ASSIGN THE ACCESS KEY AT RUNTIME -- DO NOT SAVE IN TEMPLATE"
+            }
+        },
+        "bootstrapFileShare": {
+            "type": "string",
+            "defaultValue": ""
+        },
+        "deployFirewall": {
+            "type": "bool",
+            "defaultValue": true
+        },
         "environment": {
             "type": "string",
             "defaultValue": "dev",
@@ -11,9 +41,9 @@
                 "sandbox"
             ]
         },
-        "existingVNETName": {
+        "fwName": {
             "type": "string",
-            "defaultValue": "sfc01-wu3-dev-vnet"
+            "defaultValue": ""
         },
         "location": {
             "type": "string",
@@ -22,6 +52,44 @@
                 "westus",
                 "westus2",
                 "westus3"
+            ]
+        },
+        "paSku": {
+            "type": "string",
+            "defaultValue": "byol",
+            "allowedValues": [
+                "byol",
+                "bundle1",
+                "bundle2",
+                "vmseries-flex"
+            ]
+        },
+        "paVersion": {
+            "type": "string",
+            "allowedValues": [
+                "9.0.9",
+                "9.1.0",
+                "10.0.9",
+                "10.1.6",
+                "latest"
+            ],
+            "defaultValue": "9.1.0"
+        },
+        "paOffer": {
+            "type": "string",
+            "defaultValue": "vmseries1",
+            "allowedValues": [
+                "vmseries1",
+                "vmseries-flex"
+            ]
+        },
+        "paVmSize": {
+            "type": "string",
+            "defaultValue": "Standard_DS3_v2",
+            "allowedValues": [
+                "Standard_DS3_v2",
+                "Standard_DS4_v2",
+                "Standard_DS5_v2"
             ]
         },
         "subnetPrefix": {
@@ -40,7 +108,8 @@
         "mgmtPrefix": "[concat(parameters('subnetPrefix'),'-management')]",
         "trustPrefix": "[concat(parameters('subnetPrefix'),'-trusted')]",
         "uniqueId": "[uniqueString(resourceGroup().id)]",
-        "untrustPrefix": "[concat(parameters('subnetPrefix'),'-untrusted')]"
+        "untrustPrefix": "[concat(parameters('subnetPrefix'),'-untrusted')]",
+        "customData": "[concat('storage-account=',parameters('bootstrapStorageAccount'),',access-key=',parameters('bootstrapAccessKey'),',file-share=',parameters('bootstrapFileShare'),',share-directory=',parameters('fwName'))]"
     },
     "resources": [
         {
@@ -203,6 +272,23 @@
                         }
                     },
                     {
+                        "name": "AllowICMP",
+                        "properties": {
+                            "protocol": "Icmp",
+                            "sourceAddressPrefixes": [
+                                "63.156.58.20/32",
+                                "4.1.98.242/32",
+                                "72.208.101.143/32"
+                            ],
+                            "sourcePortRange": "*",
+                            "destinationAddressPrefix": "*",
+                            "destinationPortRange": "*",
+                            "access": "Allow",
+                            "direction": "Inbound",
+                            "priority": 1230
+                        }
+                    },
+                    {
                         "name": "DenyAnyInBound",
                         "type": "Microsoft.Network/networkSecurityGroups/securityRules",
                         "properties": {
@@ -303,16 +389,16 @@
                         "properties": {
                             "addressPrefix": "0.0.0.0/0",
                             "nextHopType": "VirtualAppliance",
-                            "nextHopIpAddress": "10.16.92.4",
+                            "nextHopIpAddress": "10.18.9.4",
                             "hasBgpOverride": false
                         }
                     },
                     {
                         "name": "untrust-forced-firewall",
                         "properties": {
-                            "addressPrefix": "10.16.91.0/24",
+                            "addressPrefix": "10.18.8.0/24",
                             "nextHopType": "VirtualAppliance",
-                            "nextHopIpAddress": "10.16.92.4",
+                            "nextHopIpAddress": "10.18.9.4",
                             "hasBgpOverride": false
                         }
                     }
@@ -344,9 +430,10 @@
             }
         },
         {
-            "name": "subnetDeployment",
-            "type": "Microsoft.Resources/deployments",
-            "apiVersion": "2021-04-01",
+			// Create the Vnet
+            "name": "[concat(parameters('subnetPrefix'),'-',parameters('environment'),'-vnet')]",
+            "type": "Microsoft.Network/virtualNetworks",
+            "apiVersion": "2020-11-01",
             "dependsOn": [
                 "[resourceId('Microsoft.Network/networkSecurityGroups', concat(variables('mgmtPrefix'),'-',parameters('environment'),'-nsg'))]",
                 "[resourceId('Microsoft.Network/networkSecurityGroups', concat(variables('trustPrefix'),'-',parameters('environment'),'-nsg'))]",
@@ -355,51 +442,216 @@
                 "[resourceId('Microsoft.Network/routeTables', concat(parameters('subnetPrefix'),'-trusted-rt'))]",
                 "[resourceId('Microsoft.Network/routeTables', concat(parameters('subnetPrefix'),'-untrusted-rt'))]"
             ],
-            "resourceGroup": "sfc-network-dev-rg",
+			"tags": "[variables('tags')]",
+            "location": "[parameters('location')]",
             "properties": {
-                "mode": "Incremental",
-                "template": {
-                    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
-                    "contentVersion": "1.0.0.0",
-                    "variables": {},
-                    "resources": [
-                        {
-                            "type": "Microsoft.Network/virtualNetworks/subnets",
-                            "apiVersion": "2020-11-01",
-                            "name": "[format('{0}/{1}', parameters('existingVNETName'), concat(variables('mgmtPrefix')))]",
-                            "properties": {
-                                "addressPrefix": "10.16.4.0/24"
-                            }
-                        },
-                        {
-                            "type": "Microsoft.Network/virtualNetworks/subnets",
-                            "apiVersion": "2020-11-01",
-                            "name": "[format('{0}/{1}', parameters('existingVNETName'), concat(variables('trustPrefix')))]",
-                            "dependsOn": [
-                            //    "[resourceId('sfc-network-dev-rg','Microsoft.Network/virtualNetworks/subnets', format('{0}/{1}', parameters('existingVNETName'), concat(variables('mgmtPrefix'))))]"
-                            "/subscriptions/67b03f65-308b-456f-b4a9-572c14a374cc/resourceGroups/sfc-network-dev-rg/providers/Microsoft.Network/virtualNetworks/sfc01-wu3-dev-vnet/subnets/firewalltest-management"
-                            ],
-                            "properties": {
-                                "addressPrefix": "10.16.3.0/24"
-                            }
-                        },
-                        {
-                            "type": "Microsoft.Network/virtualNetworks/subnets",
-                            "apiVersion": "2020-11-01",
-                            "name": "[format('{0}/{1}', parameters('existingVNETName'), concat(variables('untrustPrefix')))]",
-                            "dependsOn": [
-                            //    "[resourceId('sfc-network-dev-rg','Microsoft.Network/virtualNetworks/subnets', format('{0}/{1}', parameters('existingVNETName'), concat(variables('trustPrefix'))))]"
-                            "/subscriptions/67b03f65-308b-456f-b4a9-572c14a374cc/resourceGroups/sfc-network-dev-rg/providers/Microsoft.Network/virtualNetworks/sfc01-wu3-dev-vnet/subnets/firewalltest-trusted"
-                            ],
-                            "properties": {
-                                "addressPrefix": "10.16.2.0/24"
+                "addressSpace": {
+                    "addressPrefixes": [
+                        "10.18.0.0/16"
+                    ]
+                },
+                "subnets": [
+                    {
+                        "name": "[variables('mgmtPrefix')]",
+                        "properties": {
+                            "addressPrefix": "10.18.10.0/24",
+                            "networkSecurityGroup": {
+                                "id": "[resourceId('Microsoft.Network/networkSecurityGroups',concat(variables('mgmtPrefix'),'-',parameters('environment'),'-nsg'))]"
+                            },
+                            "routeTable": {
+                                "id": "[resourceId('Microsoft.Network/routeTables',concat(parameters('subnetPrefix'),'-management-rt'))]"
                             }
                         }
-                    ],
-                    "outputs": {}
+                    },
+                    {
+                        "name": "[variables('untrustPrefix')]",
+                        "properties": {
+                            "addressPrefix": "10.18.8.0/24",
+                            "networkSecurityGroup": {
+                                "id": "[resourceId('Microsoft.Network/networkSecurityGroups',concat(variables('untrustPrefix'),'-',parameters('environment'),'-nsg'))]"
+                            },
+                            "routeTable": {
+                                "id": "[resourceId('Microsoft.Network/routeTables',concat(parameters('subnetPrefix'),'-untrusted-rt'))]"
+                            }
+                        }
+                    },
+                    {
+                        "name": "[variables('trustPrefix')]",
+                        "properties": {
+                            "addressPrefix": "10.18.9.0/24",
+                            "networkSecurityGroup": {
+                                "id": "[resourceId('Microsoft.Network/networkSecurityGroups',concat(variables('trustPrefix'),'-',parameters('environment'),'-nsg'))]"
+                            },
+                            "routeTable": {
+                                "id": "[resourceId('Microsoft.Network/routeTables',concat(parameters('subnetPrefix'),'-trusted-rt'))]"
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            // create the Management NIC
+            "name": "[concat(variables('mgmtPrefix'),'-nic')]",
+            "type": "Microsoft.Network/networkInterfaces",
+            "apiVersion": "2020-11-01",
+            "tags": "[variables('tags')]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/virtualNetworks', concat(parameters('subnetPrefix'),'-',parameters('environment'),'-vnet'))]",
+                "[resourceId('Microsoft.Network/publicIPAddresses', concat(variables('mgmtPrefix'),'-',parameters('environment'),'-pip'))]"
+            ],
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "[variables('mgmtPrefix')]",
+                        "properties": {
+                            "privateIPAllocationMethod": "Static",
+                            "privateIPAddress": "10.18.10.4",
+                            "subnet": {
+                                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets',concat(parameters('subnetPrefix'),'-',parameters('environment'),'-vnet'),variables('mgmtPrefix'))]"
+                            },
+                            "publicIPAddress": {
+                                "id": "[resourceId('Microsoft.Network/publicIPAddresses',concat(variables('mgmtPrefix'),'-',parameters('environment'),'-pip'))]"
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            // create the Untrusted NIC
+            "name": "[concat(variables('untrustPrefix'),'-nic')]",
+            "type": "Microsoft.Network/networkInterfaces",
+            "apiVersion": "2020-11-01",
+            "tags": "[variables('tags')]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/virtualNetworks', concat(parameters('subnetPrefix'),'-',parameters('environment'),'-vnet'))]",
+                "[resourceId('Microsoft.Network/publicIPAddresses', concat(variables('untrustPrefix'),'-',parameters('environment'),'-pip'))]"
+            ],
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "[variables('untrustPrefix')]",
+                        "properties": {
+                            "privateIPAllocationMethod": "Static",
+                            "privateIPAddress": "10.18.8.4",
+                            "subnet": {
+                                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets',concat(parameters('subnetPrefix'),'-',parameters('environment'),'-vnet'),variables('untrustPrefix'))]"
+                            },
+                            "publicIPAddress": {
+                                "id": "[resourceId('Microsoft.Network/publicIPAddresses',concat(variables('untrustPrefix'),'-',parameters('environment'),'-pip'))]"
+                            }
+                        }
+                    }
+                ],
+                "enableIPForwarding": true
+            }
+        },
+        {
+            // create the Trusted NIC
+            "name": "[concat(variables('trustPrefix'),'-nic')]",
+            "type": "Microsoft.Network/networkInterfaces",
+            "apiVersion": "2020-11-01",
+            "tags": "[variables('tags')]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/virtualNetworks', concat(parameters('subnetPrefix'),'-',parameters('environment'),'-vnet'))]"
+            ],
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "[variables('trustPrefix')]",
+                        "properties": {
+                            "privateIPAllocationMethod": "Static",
+                            "privateIPAddress": "10.18.9.4",
+                            "subnet": {
+                                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', concat(parameters('subnetPrefix'),'-',parameters('environment'),'-vnet'),variables('trustPrefix'))]"
+                            }
+                        }
+                    }
+                ],
+                "enableIPForwarding": true
+            }
+        },
+        {
+            // create the firewall
+            "name": "[parameters('fwName')]",
+            "type": "Microsoft.Compute/virtualMachines",
+            "apiVersion": "2021-03-01",
+            "condition": "[parameters('deployFirewall')]",
+            "tags": "[variables('tags')]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/networkInterfaces', concat(variables('mgmtPrefix'),'-nic'))]",
+                "[resourceId('Microsoft.Network/networkInterfaces', concat(variables('trustPrefix'),'-nic'))]",
+                "[resourceId('Microsoft.Network/networkInterfaces', concat(variables('untrustPrefix'),'-nic'))]"
+            ],
+            "plan": {
+                "name": "[parameters('paSku')]",
+                "product": "[parameters('paOffer')]",
+                "publisher": "paloaltonetworks"
+            },
+            "properties": {
+                "hardwareProfile": {
+                    "vmSize": "[parameters('paVmSize')]"
+                },
+                "osProfile": {
+                    "computerName": "[parameters('fwName')]",
+                    "adminUsername": "[parameters('adminUsername')]",
+                    "adminPassword": "[parameters('adminPassword')]" ,
+                    "customData": "[base64(variables('customData'))]"
+                },
+                "storageProfile": {
+                    "imageReference": {
+                        "publisher": "paloaltonetworks",
+                        "offer": "[parameters('paOffer')]",
+                        "sku": "[parameters('paSku')]",
+                        "version": "[parameters('paVersion')]"
+                    },
+                    "osDisk": {
+                        "name": "[concat(parameters('fwName'),'-OSDisk')]",
+                        "managedDisk": {
+                            "storageAccountType": "Standard_LRS"
+                        },
+                        "caching": "ReadWrite",
+                        "createOption": "FromImage"
+                    }
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces',concat(variables('mgmtPrefix'),'-nic'))]",
+                            "properties": {
+                                "primary": true
+                            }
+                        },
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces',concat(variables('untrustPrefix'),'-nic'))]",
+                            "properties": {
+                                "primary": false
+                            }
+                        },
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces',concat(variables('trustPrefix'),'-nic'))]",
+                            "properties": {
+                                "primary": false
+                            }
+                        }
+                    ]
                 }
             }
         }
     ],
-    "outputs": {}
+    "outputs": {
+        "firewall.username": {
+            "type": "string",
+            "value": "[reference(resourceId('Microsoft.Compute/virtualMachines',parameters('fwName'))).osProfile.adminUsername]"
+        },
+        "custom-data": {
+            "type": "string",
+            "value": "[variables('customData')]"
+        }
+    }
 }

@@ -1,0 +1,42 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "adminUsername": {
+            "value": "sfcadmin"
+        },
+        "bootstrapFileShare": {
+            "value": "boot-strap"
+        },
+        "bootstrapStorageAccount": {
+            "value": "sfc01ccoesa"
+        },
+        "environment": {
+            "value": "sandbox"
+        },
+        "fwName": {
+            "value": "aw3lpaltest01"
+        },
+        "location": {
+            "value": "westus3"
+        },
+        "paSku": {
+            "value": "byol"
+        },
+        "paVersion": {
+            "value": "10.1.6"
+        },
+        "paOffer": {
+            "value": "vmseries-flex"
+        },
+        "paVmSize": {
+            "value": "Standard_DS3_v2"
+        },
+        //"serverVmName": {
+        //    "value": "aw3ltest01"
+        //},
+        "subnetPrefix": {
+            "value": "fwtest1"
+        }
+    }
+}
