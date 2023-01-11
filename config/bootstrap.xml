@@ -839,7 +839,7 @@ ieWrLBa2guUiv9zauvkf1jAdsyjcn9wFMlW1FxCjqUL35SSS
             </primary-ntp-server>
           </ntp-servers>
           <motd-and-banner>
-            <banner-header>pavm01</banner-header>
+            <banner-header>aw3lpaltest01</banner-header>
             <banner-header-color>color14</banner-header-color>
             <banner-header-text-color>color15</banner-header-text-color>
             <banner-header-footer-match>no</banner-header-footer-match>
@@ -853,7 +853,7 @@ ieWrLBa2guUiv9zauvkf1jAdsyjcn9wFMlW1FxCjqUL35SSS
           <management>
             <hostname-type-in-syslog>FQDN</hostname-type-in-syslog>
             <initcfg>
-              <hostname>aw3lpalsfw</hostname>
+              <hostname>aw3lpaltest01</hostname>
               <username>sfcadmin</username>
               <type>
                 <dhcp-client>
@@ -976,7 +976,7 @@ ieWrLBa2guUiv9zauvkf1jAdsyjcn9wFMlW1FxCjqUL35SSS
                   <action>allow</action>
                   <rule-type>intrazone</rule-type>
                 </entry>
-                <entry name="Permit untrust to aw3lfwtest01" uuid="325d8f27-a7aa-4042-9b01-16d090ca5c55">
+                <entry name="Permit untrust to aw3ltest01" uuid="325d8f27-a7aa-4042-9b01-16d090ca5c55">
                   <to>
                     <member>Trust</member>
                   </to>
@@ -1235,7 +1235,7 @@ ieWrLBa2guUiv9zauvkf1jAdsyjcn9wFMlW1FxCjqUL35SSS
                   <service>any</service>
                   <to-interface>ethernet1/1</to-interface>
                 </entry>
-                <entry name="Destination NAT for aw3lfwtest01" uuid="862fea69-f2ab-4368-9ac1-c5391d1b942e">
+                <entry name="Destination NAT for aw3ltest01" uuid="862fea69-f2ab-4368-9ac1-c5391d1b942e">
                   <destination-translation>
                     <translated-port>22</translated-port>
                     <translated-address>10.16.92.10</translated-address>
