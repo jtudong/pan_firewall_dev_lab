@@ -18,7 +18,7 @@
             "defaultValue": ""
         },
         "bootstrapAccessKey": {
-            "type": "string",
+            "type": "securestring",
             "defaultValue": "",
             "metadata": {
                 "description": "ASSIGN THE ACCESS KEY AT RUNTIME -- DO NOT SAVE IN TEMPLATE"
