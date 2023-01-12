@@ -54,6 +54,10 @@
                 "westus3"
             ]
         },
+        "osDiskType": {
+            "type": "string",
+            "defaultValue": "Standard_LRS"
+        },
         "paSku": {
             "type": "string",
             "defaultValue": "byol",
@@ -95,6 +99,21 @@
         "subnetPrefix": {
             "type": "string",
             "defaultValue": ""
+        },
+        "serverVmName": {
+            "type": "string",
+            "defaultValue": "aw3lfwtest01"
+        },
+        "serverVmSize": {
+            "type": "string",
+            "defaultValue": "Standard_B2s",
+            "allowedValues": [
+                "Standard_B1s",
+                "Standard_B2s",
+                "Standard_B2ms",
+                "Standard_DS1_v2",
+                "Standard_DS2_v3"
+            ]
         }
     },
     "functions": [],
@@ -109,7 +128,8 @@
         "trustPrefix": "[concat(parameters('subnetPrefix'),'-trusted')]",
         "uniqueId": "[uniqueString(resourceGroup().id)]",
         "untrustPrefix": "[concat(parameters('subnetPrefix'),'-untrusted')]",
-        "customData": "[concat('storage-account=',parameters('bootstrapStorageAccount'),',access-key=',parameters('bootstrapAccessKey'),',file-share=',parameters('bootstrapFileShare'),',share-directory=',parameters('fwName'))]"
+        "customData": "[concat('storage-account=',parameters('bootstrapStorageAccount'),',access-key=',parameters('bootstrapAccessKey'),',file-share=',parameters('bootstrapFileShare'),',share-directory=',parameters('fwName'))]",
+        "storageAccountName": "[concat(parameters('fwName'),skip(variables('uniqueId'),5),'sa')]"
     },
     "resources": [
         {
@@ -640,6 +660,122 @@
                             }
                         }
                     ]
+                }
+            }
+        },
+        //
+        //
+        //
+        //
+        //
+        //  Create the test server
+        //
+        //
+        //
+        //
+        //
+        //
+        //
+        //
+        //
+        //
+        //
+        //
+        {
+            //  storage account
+            "name": "[variables('storageAccountName')]",
+            "type": "Microsoft.Storage/storageAccounts",
+            "apiVersion": "2021-04-01",
+            "tags": "[variables('tags')]",
+            "location": "[parameters('location')]",
+            "kind": "StorageV2",
+            "sku": {
+                "name": "Standard_LRS",
+                "tier": "Standard"
+            }
+        },
+        {
+            //    network interface
+            //
+            "condition": true,
+            "name": "[concat(parameters('serverVmName'),'-nic')]",
+            "type": "Microsoft.Network/networkInterfaces",
+            "apiVersion": "2020-11-01",
+            "location": "[parameters('location')]",
+            "tags": "[variables('tags')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/virtualNetworks', concat(parameters('subnetPrefix'),'-',parameters('environment'),'-vnet'))]"
+            ],
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "ipConfig1",
+                        "properties": {
+                            "privateIPAllocationMethod": "Static",
+                            "privateIPAddress": "10.18.3.10",
+                            "subnet": {
+                                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets',concat(parameters('subnetPrefix'),'-',parameters('environment'),'-vnet'),variables('trustPrefix'))]"
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            //  create the server VM
+            //
+            "condition": true,
+            "name": "[parameters('serverVmName')]",
+            "type": "Microsoft.Compute/virtualMachines",
+            "apiVersion": "2021-03-01",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/networkInterfaces', concat(parameters('serverVmName'),'-nic'))]",
+                "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]"
+            ],
+            "tags": "[variables('tags')]",
+            "properties": {
+                "hardwareProfile": {
+                    "vmSize": "[parameters('serverVmSize')]"
+                },
+                "storageProfile": {
+                    "osDisk": {
+                        "name": "[concat(parameters('serverVmName'),'-OSDisk')]",
+                        "caching": "ReadWrite",
+                        "createOption": "fromImage",
+                        "managedDisk": {
+                            "storageAccountType": "[parameters('osDiskType')]"
+                        }
+                    },
+                    "imageReference": {
+                        "publisher": "Canonical",
+                        "offer": "0001-com-ubuntu-server-jammy",
+                        "sku": "22_04-lts",
+                        "version": "latest"
+                    }
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces',concat(parameters('serverVmName'),'-nic'))]"
+                        }
+                    ]
+                },
+                "osProfile": {
+                    "computerName": "[parameters('serverVmName')]",
+                    "adminUsername": "[parameters('adminUsername')]",
+                    "adminPassword": "[parameters('adminPassword')]",
+                    "linuxConfiguration": {
+                        "patchSettings": {
+                            "patchMode": "ImageDefault"
+                        }
+                    }
+                },
+                "diagnosticsProfile": {
+                    "bootDiagnostics": {
+                        "enabled": true,
+                        "storageUri": "[concat('https://',variables('storageAccountName'),'.blob.core.windows.net/')]"
+                    }
                 }
             }
         }
