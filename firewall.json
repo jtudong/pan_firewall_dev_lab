@@ -96,13 +96,13 @@
                 "Standard_DS5_v2"
             ]
         },
-        "subnetPrefix": {
+        "subnetPrefixName": {
             "type": "string",
             "defaultValue": ""
         },
         "serverVmName": {
             "type": "string",
-            "defaultValue": "aw3lfwtest01"
+            "defaultValue": ""
         },
         "serverVmSize": {
             "type": "string",
@@ -114,6 +114,10 @@
                 "Standard_DS1_v2",
                 "Standard_DS2_v3"
             ]
+        },
+        "subnetPrefixTrusted": {
+            "type": "string",
+            "defaultValue": ""
         }
     },
     "functions": [],
@@ -122,12 +126,12 @@
             "Department": "it",
             "Team": "networking",
             "Environment": "[parameters('environment')]",
-            "Application": "[parameters('subnetPrefix')]"
+            "Application": "[parameters('subnetPrefixName')]"
         },
-        "mgmtPrefix": "[concat(parameters('subnetPrefix'),'-management')]",
-        "trustPrefix": "[concat(parameters('subnetPrefix'),'-trusted')]",
+        "mgmtPrefix": "[concat(parameters('subnetPrefixName'),'-management')]",
+        "trustPrefix": "[concat(parameters('subnetPrefixName'),'-trusted')]",
         "uniqueId": "[uniqueString(resourceGroup().id)]",
-        "untrustPrefix": "[concat(parameters('subnetPrefix'),'-untrusted')]",
+        "untrustPrefix": "[concat(parameters('subnetPrefixName'),'-untrusted')]",
         "customData": "[concat('storage-account=',parameters('bootstrapStorageAccount'),',access-key=',parameters('bootstrapAccessKey'),',file-share=',parameters('bootstrapFileShare'),',share-directory=',parameters('fwName'))]",
         "storageAccountName": "[concat(parameters('fwName'),skip(variables('uniqueId'),5),'sa')]"
     },
@@ -202,7 +206,7 @@
                             "sourcePortRange": "*",
                             "destinationPortRange": "*",
                             "sourceAddressPrefix": "168.63.129.16/32",
-                            "destinationAddressPrefix": "10.16.91.0/24",
+                            "destinationAddressPrefix": "10.18.8.0/24",
                             "access": "Allow",
                             "priority": 1000,
                             "direction": "Inbound",
@@ -336,7 +340,7 @@
                             "sourcePortRange": "*",
                             "destinationPortRange": "*",
                             "sourceAddressPrefix": "*",
-                            "destinationAddressPrefix": "10.16.0.0/16",
+                            "destinationAddressPrefix": "10.18.0.0/16",
                             "access": "Deny",
                             "priority": 4096,
                             "direction": "Outbound",
@@ -396,7 +400,7 @@
         },
         {
             // Trusted subnet route table
-            "name": "[concat(parameters('subnetPrefix'),'-trusted-rt')]",
+            "name": "[concat(parameters('subnetPrefixName'),'-trusted-rt')]",
             "type": "Microsoft.Network/routeTables",
             "apiVersion": "2020-11-01",
             "tags": "[variables('tags')]",
@@ -427,7 +431,7 @@
         },
         {
             // Unrusted subnet route table
-            "name": "[concat(parameters('subnetPrefix'),'-untrusted-rt')]",
+            "name": "[concat(parameters('subnetPrefixName'),'-untrusted-rt')]",
             "type": "Microsoft.Network/routeTables",
             "apiVersion": "2020-11-01",
             "tags": "[variables('tags')]",
@@ -439,7 +443,7 @@
         },
         {
             // Management subnet route table
-            "name": "[concat(parameters('subnetPrefix'),'-management-rt')]",
+            "name": "[concat(parameters('subnetPrefixName'),'-management-rt')]",
             "type": "Microsoft.Network/routeTables",
             "apiVersion": "2020-11-01",
             "tags": "[variables('tags')]",
@@ -451,16 +455,16 @@
         },
         {
 			// Create the Vnet
-            "name": "[concat(parameters('subnetPrefix'),'-',parameters('environment'),'-vnet')]",
+            "name": "[concat(parameters('subnetPrefixName'),'-',parameters('environment'),'-vnet')]",
             "type": "Microsoft.Network/virtualNetworks",
             "apiVersion": "2020-11-01",
             "dependsOn": [
                 "[resourceId('Microsoft.Network/networkSecurityGroups', concat(variables('mgmtPrefix'),'-',parameters('environment'),'-nsg'))]",
                 "[resourceId('Microsoft.Network/networkSecurityGroups', concat(variables('trustPrefix'),'-',parameters('environment'),'-nsg'))]",
                 "[resourceId('Microsoft.Network/networkSecurityGroups', concat(variables('untrustPrefix'),'-',parameters('environment'),'-nsg'))]",
-                "[resourceId('Microsoft.Network/routeTables', concat(parameters('subnetPrefix'),'-management-rt'))]",
-                "[resourceId('Microsoft.Network/routeTables', concat(parameters('subnetPrefix'),'-trusted-rt'))]",
-                "[resourceId('Microsoft.Network/routeTables', concat(parameters('subnetPrefix'),'-untrusted-rt'))]"
+                "[resourceId('Microsoft.Network/routeTables', concat(parameters('subnetPrefixName'),'-management-rt'))]",
+                "[resourceId('Microsoft.Network/routeTables', concat(parameters('subnetPrefixName'),'-trusted-rt'))]",
+                "[resourceId('Microsoft.Network/routeTables', concat(parameters('subnetPrefixName'),'-untrusted-rt'))]"
             ],
 			"tags": "[variables('tags')]",
             "location": "[parameters('location')]",
@@ -479,7 +483,7 @@
                                 "id": "[resourceId('Microsoft.Network/networkSecurityGroups',concat(variables('mgmtPrefix'),'-',parameters('environment'),'-nsg'))]"
                             },
                             "routeTable": {
-                                "id": "[resourceId('Microsoft.Network/routeTables',concat(parameters('subnetPrefix'),'-management-rt'))]"
+                                "id": "[resourceId('Microsoft.Network/routeTables',concat(parameters('subnetPrefixName'),'-management-rt'))]"
                             }
                         }
                     },
@@ -491,7 +495,7 @@
                                 "id": "[resourceId('Microsoft.Network/networkSecurityGroups',concat(variables('untrustPrefix'),'-',parameters('environment'),'-nsg'))]"
                             },
                             "routeTable": {
-                                "id": "[resourceId('Microsoft.Network/routeTables',concat(parameters('subnetPrefix'),'-untrusted-rt'))]"
+                                "id": "[resourceId('Microsoft.Network/routeTables',concat(parameters('subnetPrefixName'),'-untrusted-rt'))]"
                             }
                         }
                     },
@@ -503,7 +507,7 @@
                                 "id": "[resourceId('Microsoft.Network/networkSecurityGroups',concat(variables('trustPrefix'),'-',parameters('environment'),'-nsg'))]"
                             },
                             "routeTable": {
-                                "id": "[resourceId('Microsoft.Network/routeTables',concat(parameters('subnetPrefix'),'-trusted-rt'))]"
+                                "id": "[resourceId('Microsoft.Network/routeTables',concat(parameters('subnetPrefixName'),'-trusted-rt'))]"
                             }
                         }
                     }
@@ -518,7 +522,7 @@
             "tags": "[variables('tags')]",
             "location": "[parameters('location')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Network/virtualNetworks', concat(parameters('subnetPrefix'),'-',parameters('environment'),'-vnet'))]",
+                "[resourceId('Microsoft.Network/virtualNetworks', concat(parameters('subnetPrefixName'),'-',parameters('environment'),'-vnet'))]",
                 "[resourceId('Microsoft.Network/publicIPAddresses', concat(variables('mgmtPrefix'),'-',parameters('environment'),'-pip'))]"
             ],
             "properties": {
@@ -529,7 +533,7 @@
                             "privateIPAllocationMethod": "Static",
                             "privateIPAddress": "10.18.10.4",
                             "subnet": {
-                                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets',concat(parameters('subnetPrefix'),'-',parameters('environment'),'-vnet'),variables('mgmtPrefix'))]"
+                                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets',concat(parameters('subnetPrefixName'),'-',parameters('environment'),'-vnet'),variables('mgmtPrefix'))]"
                             },
                             "publicIPAddress": {
                                 "id": "[resourceId('Microsoft.Network/publicIPAddresses',concat(variables('mgmtPrefix'),'-',parameters('environment'),'-pip'))]"
@@ -547,7 +551,7 @@
             "tags": "[variables('tags')]",
             "location": "[parameters('location')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Network/virtualNetworks', concat(parameters('subnetPrefix'),'-',parameters('environment'),'-vnet'))]",
+                "[resourceId('Microsoft.Network/virtualNetworks', concat(parameters('subnetPrefixName'),'-',parameters('environment'),'-vnet'))]",
                 "[resourceId('Microsoft.Network/publicIPAddresses', concat(variables('untrustPrefix'),'-',parameters('environment'),'-pip'))]"
             ],
             "properties": {
@@ -558,7 +562,7 @@
                             "privateIPAllocationMethod": "Static",
                             "privateIPAddress": "10.18.8.4",
                             "subnet": {
-                                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets',concat(parameters('subnetPrefix'),'-',parameters('environment'),'-vnet'),variables('untrustPrefix'))]"
+                                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets',concat(parameters('subnetPrefixName'),'-',parameters('environment'),'-vnet'),variables('untrustPrefix'))]"
                             },
                             "publicIPAddress": {
                                 "id": "[resourceId('Microsoft.Network/publicIPAddresses',concat(variables('untrustPrefix'),'-',parameters('environment'),'-pip'))]"
@@ -577,7 +581,7 @@
             "tags": "[variables('tags')]",
             "location": "[parameters('location')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Network/virtualNetworks', concat(parameters('subnetPrefix'),'-',parameters('environment'),'-vnet'))]"
+                "[resourceId('Microsoft.Network/virtualNetworks', concat(parameters('subnetPrefixName'),'-',parameters('environment'),'-vnet'))]"
             ],
             "properties": {
                 "ipConfigurations": [
@@ -587,7 +591,7 @@
                             "privateIPAllocationMethod": "Static",
                             "privateIPAddress": "10.18.9.4",
                             "subnet": {
-                                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', concat(parameters('subnetPrefix'),'-',parameters('environment'),'-vnet'),variables('trustPrefix'))]"
+                                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', concat(parameters('subnetPrefixName'),'-',parameters('environment'),'-vnet'),variables('trustPrefix'))]"
                             }
                         }
                     }
@@ -704,7 +708,7 @@
             "location": "[parameters('location')]",
             "tags": "[variables('tags')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Network/virtualNetworks', concat(parameters('subnetPrefix'),'-',parameters('environment'),'-vnet'))]"
+                "[resourceId('Microsoft.Network/virtualNetworks', concat(parameters('subnetPrefixName'),'-',parameters('environment'),'-vnet'))]"
             ],
             "properties": {
                 "ipConfigurations": [
@@ -712,9 +716,9 @@
                         "name": "ipConfig1",
                         "properties": {
                             "privateIPAllocationMethod": "Static",
-                            "privateIPAddress": "10.18.3.10",
+                            "privateIPAddress": "10.18.9.10",
                             "subnet": {
-                                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets',concat(parameters('subnetPrefix'),'-',parameters('environment'),'-vnet'),variables('trustPrefix'))]"
+                                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets',concat(parameters('subnetPrefixName'),'-',parameters('environment'),'-vnet'),variables('trustPrefix'))]"
                             }
                         }
                     }
@@ -788,6 +792,10 @@
         "custom-data": {
             "type": "string",
             "value": "[variables('customData')]"
+        },
+        "trusted-subnet": {
+            "type": "string",
+            "value": "[concat(parameters('subnetPrefixTrusted'),'.0')]"
         }
     }
 }

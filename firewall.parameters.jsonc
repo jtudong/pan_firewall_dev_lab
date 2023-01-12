@@ -32,11 +32,14 @@
         "paVmSize": {
             "value": "Standard_DS3_v2"
         },
-        //"serverVmName": {
-        //    "value": "aw3ltest01"
-        //},
-        "subnetPrefix": {
+        "serverVmName": {
+            "value": "aw3lfwtest01"
+        },
+        "subnetPrefixName": {
             "value": "fwtest1"
+        },
+        "subnetPrefixTrusted": {
+            "value": "10.18.9"
         }
     }
 }
