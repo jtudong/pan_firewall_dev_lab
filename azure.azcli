@@ -1,13 +1,13 @@
 az group list -o table | grep fwtest
 
 # detach the nsg and route-table
-az network vnet subnet update --route-table ""  --nsg "" -g sfc-network-dev-rg --vnet-name sfc01-wu3-dev-vnet -n firewalltest-management 
-az network vnet subnet update --route-table ""  --nsg "" -g sfc-network-dev-rg --vnet-name sfc01-wu3-dev-vnet -n firewalltest-trusted 
-az network vnet subnet update --route-table ""  --nsg "" -g sfc-network-dev-rg --vnet-name sfc01-wu3-dev-vnet -n firewalltest-untrusted
+az network vnet subnet update --route-table ""  --nsg "" -g sfc-fwtest1-sandbox-rg --vnet-name fwtest1-sandbox-vnet -n fwtest1-management 
+az network vnet subnet update --route-table ""  --nsg "" -g sfc-fwtest1-sandbox-rg --vnet-name fwtest1-sandbox-vnet -n fwtest1-trusted 
+az network vnet subnet update --route-table ""  --nsg "" -g sfc-fwtest1-sandbox-rg --vnet-name fwtest1-sandbox-vnet -n fwtest1-untrusted
 
-az network vnet subnet delete -g sfc-network-dev-rg --vnet-name sfc01-wu3-dev-vnet -n firewalltest-management --no-wait
-az network vnet subnet delete -g sfc-network-dev-rg --vnet-name sfc01-wu3-dev-vnet -n firewalltest-trusted --no-wait
-az network vnet subnet delete -g sfc-network-dev-rg --vnet-name sfc01-wu3-dev-vnet -n firewalltest-untrusted --no-wait
+az network vnet subnet delete -g sfc-fwtest1-sandbox-rg --vnet-name fwtest1-sandbox-vnet -n fwtest1-management --no-wait
+az network vnet subnet delete -g sfc-fwtest1-sandbox-rg --vnet-name fwtest1-sandbox-vnet -n fwtest1-trusted --no-wait
+az network vnet subnet delete -g sfc-fwtest1-sandbox-rg --vnet-name fwtest1-sandbox-vnet -n fwtest1-untrusted --no-wait
 
 az group delete -n sfc-fwtest1-sandbox-rg --yes --no-wait
 watch 'az group list -o table | grep fwtest'
