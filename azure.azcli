@@ -17,7 +17,7 @@ az deployment group validate -g sfc-fwtest1-sandbox-rg -f firewall.json -p firew
 az deployment group create -c -g sfc-fwtest1-sandbox-rg -f firewall.json -p firewall.parameters.jsonc adminPassword= \
   -n fwtest1-20230109-1815
 
-git switch master&&git merge development&&git push&&git push github&&git switch development$$gg -6
+git switch master&&git merge development&&git push&&git push github&&git switch development
 
 # Resource ID example
 
