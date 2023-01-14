@@ -21,6 +21,7 @@ git switch master&&git merge development&&git push&&git push github&&git switch 
 
 ssh-keygen -f "/home/linuxuser/.ssh/known_hosts" -R "fwtest1-management.westus3.cloudapp.azure.com"
 ssh sfcadmin@fwtest1-management.westus3.cloudapp.azure.com
+ssh sfcadmin@fwtest1-untrusted.westus3.cloudapp.azure.com -p 6622
 
 # Resource ID example
 
