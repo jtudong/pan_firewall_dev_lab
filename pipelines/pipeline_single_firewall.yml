@@ -74,8 +74,8 @@ stages:
         - bash: |
             echo 'bootstrapAccessKey = '$(bootstrapAccessKey)
             echo 'deployFirewall = '$(deployFirewall)
-            echo 'environment ='$(environment)
-            edho 'location = '$(location)
+            echo 'environment = '$(environment)
+            echo 'location = '$(location)
             echo 'parameterFile ='$(parameterFile)
             echo 'subnetPrefix ='$(subnetPrefix)
             echo 'templateFile ='$(templateFile)
