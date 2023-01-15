@@ -103,6 +103,7 @@ stages:
 
     - job: wait
       pool: server
+      dependsOn: deployTemplate
       steps:
         - task: Delay@1
           displayName: Wait for the Firewall deployment to complete
