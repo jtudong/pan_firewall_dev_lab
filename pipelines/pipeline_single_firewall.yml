@@ -35,6 +35,7 @@ stages:
 - stage: prerequisites
   jobs:
     - job: createResourceGroup
+      displayName: Create the Resource Group
       steps:
         - task: AzureCLI@2
           inputs:
@@ -99,3 +100,26 @@ stages:
             csmParametersFile: $(parameterFile)
             overrideParameters: -adminPassword $(adminPassword) -bootstrapAccessKey $(bootstrapAccessKey)
             deploymentMode: Incremental
+
+    - job: wait
+      steps:
+        - task: Delay@1
+          displayName: Wait for the Firewall deployment to complete
+          inputs:
+            delayForMinutes: '20'
+
+#    - job: configureApiKey
+#      steps:
+#        - task: SSH@0
+#          inputs:
+#            sshEndpoint:   # Required  # SSH service connection with connection details for the remote machine.
+#            runOptions: commands # Options: 'commands', 'script', 'inline' # Required  # Choose to either run shell commands or a shell script on the remote machine.
+#            commands:   # Required when runOptions = commands  # Specify the shell commands to run on the remote machine. Enter each command along with its arguments on a new line. To run multiple commands together, enter them on the same line separated by semi-colons (e.g. cd /home/user/myFolder;build).
+#            scriptPath:   # Required when runOptions = script  # Path to the shell script file to run on the remote machine.
+#            inline:   # Required when runOptions = inline  # Write the shell script to run on the remote machine.
+#            #interpreterCommand:  # Optional  # Path to the command interpreter used to execute the script. Adds a shebang line to the beginning of the script. Relevant only for UNIX-like operating systems. Please use empty string for Windows-based remote hosts. [See more about shebang (#!)](https://homepages.cwi.nl/~aeb/std/shebang/unix-faq.txt)
+#            #args:  # Optional  # Arguments to pass to the shell script.
+#            #failOnStdErr:  # Optional  # If this option is selected, the build will fail when the remote commands or script write to STDERR.
+#            #interactiveSession:  # Optional  # If this option is selected, interactive session will be started - if there's a password request, it will be filled by user's password. It could be useful to run commands like 'sudo'
+#            readyTimeout: 20000  # Required  # How long (in milliseconds) to wait for the SSH handshake to complete.
+        
