@@ -102,6 +102,7 @@ stages:
             deploymentMode: Incremental
 
     - job: wait
+      pool: server
       steps:
         - task: Delay@1
           displayName: Wait for the Firewall deployment to complete
