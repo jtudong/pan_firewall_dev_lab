@@ -9,7 +9,7 @@
             "value": "boot-strap"
         },
         "bootstrapStorageAccount": {
-            "value": "sfc01ccoesa"
+            "value": "sandboxbootstrap"
         },
         "environment": {
             "value": "sandbox"
