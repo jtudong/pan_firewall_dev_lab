@@ -120,7 +120,7 @@ stages:
         - task: SSH@0
           displayName: Write license api-key to firewall
           inputs:
-            sshEndpoint: sfcadmin@fwtest1-management.westus3.cloudapp.azure.com
+            sshEndpoint: fwtest1-management.westus3.cloudapp.azure.com
             #sshEndpoint:   # Required  # SSH service connection with connection details for the remote machine.
             runOptions: commands
             #runOptions: commands # Options: 'commands', 'script', 'inline' # Required  # Choose to either run shell commands or a shell script on the remote machine.
