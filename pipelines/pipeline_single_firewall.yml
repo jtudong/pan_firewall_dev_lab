@@ -76,9 +76,9 @@ stages:
             echo 'deployFirewall = '$(deployFirewall)
             echo 'environment = '$(environment)
             echo 'location = '$(location)
-            echo 'parameterFile ='$(parameterFile)
-            echo 'subnetPrefix ='$(subnetPrefix)
-            echo 'templateFile ='$(templateFile)
+            echo 'parameterFile = '$(parameterFile)
+            echo 'subnetPrefix = '$(subnetPrefix)
+            echo 'templateFile = '$(templateFile)
             echo 'varResourceGroupName = '$(varResourceGroupName)
             echo 'pwd'
             pwd
