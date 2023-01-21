@@ -12,7 +12,7 @@ az network vnet subnet delete -g sfc-fwtest1-sandbox-rg --vnet-name fwtest1-sand
 az group delete -n sfc-fwtest1-sandbox-rg --yes --no-wait
 watch 'az group list -o table | grep fwtest'
 
-az group create -l westus3 -n sfc-fwtest1-sandbox-rg
+az group create -l westus3 -n sfc-fwtest1-sandbox-rg --tags Application=network Team=networking Department=it Environment=sandbox
 az deployment group validate -g sfc-fwtest1-sandbox-rg -f firewall.json -p firewall.parameters.jsonc
 az deployment group create -c -g sfc-fwtest1-sandbox-rg -f firewall.json -p firewall.parameters.jsonc adminPassword= \
   -n fwtest1-20230109-1815
@@ -23,8 +23,9 @@ az pipelines run -p pan-firewall-dev-lab --name pipeline_single_firewall --branc
 git switch master&&git merge development&&git push&&git push github&&git switch development
 
 ssh-keygen -f "/home/linuxuser/.ssh/known_hosts" -R "fwtest1-management.westus3.cloudapp.azure.com"
+ssh-keygen -f "/home/linuxuser/.ssh/known_hosts" -R "[fwtest1-untrusted.westus3.cloudapp.azure.com]:6622"
 ssh sfcadmin@fwtest1-management.westus3.cloudapp.azure.com
-ssh sfcadmin@fwtest1-untrusted.westus3.cloudapp.azure.com -p 6622
+ssh localadmin@fwtest1-untrusted.westus3.cloudapp.azure.com -p 6622
 
 # Resource ID example
 
