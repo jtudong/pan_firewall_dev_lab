@@ -1,8 +1,10 @@
 az pipelines variable-group create \
 --name firewall-vars-1 \
---variables subnetPrefix=firewalltest \
+--variables subnetPrefix=fwtest1 \
 environment=sandbox \
 location=westus3 \
+parameterFile=firewall.parameters.jsonc \
+templateFile=firewall.json \
 deployFirewall=true \
 --authorize=true \
 --output yaml
