@@ -114,17 +114,17 @@ stages:
           inputs:
             delayForMinutes: '15'
 
-    - job: configureApiKey
-      dependsOn: wait
-      steps:
-        - task: SSH@0
-          displayName: Write license api-key to firewall
-          inputs:
-            sshEndpoint: fwtest1-management.westus3.cloudapp.azure.com
+#    - job: configureApiKey
+#      dependsOn: wait
+#      steps:
+#        - task: SSH@0
+#          displayName: Write license api-key to firewall
+#          inputs:
+#            sshEndpoint: fwtest1-management.westus3.cloudapp.azure.com
             #sshEndpoint:   # Required  # SSH service connection with connection details for the remote machine.
-            runOptions: commands
+#            runOptions: commands
             #runOptions: commands # Options: 'commands', 'script', 'inline' # Required  # Choose to either run shell commands or a shell script on the remote machine.
-            commands: request license api-key set key $( licenseApiKeyValue );quit
+#            commands: request license api-key set key $( licenseApiKeyValue );quit
             #commands:   # Required when runOptions = commands  # Specify the shell commands to run on the remote machine. Enter each command along with its arguments on a new line. To run multiple commands together, enter them on the same line separated by semi-colons (e.g. cd /home/user/myFolder;build).
             #scriptPath:   # Required when runOptions = script  # Path to the shell script file to run on the remote machine.
             #inline:   # Required when runOptions = inline  # Write the shell script to run on the remote machine.
@@ -132,6 +132,6 @@ stages:
             #args:  # Optional  # Arguments to pass to the shell script.
             #failOnStdErr:  # Optional  # If this option is selected, the build will fail when the remote commands or script write to STDERR.
             #interactiveSession:  # Optional  # If this option is selected, interactive session will be started - if there's a password request, it will be filled by user's password. It could be useful to run commands like 'sudo'
-            readyTimeout: 5000
+#            readyTimeout: 5000
             #readyTimeout: 20000  # Required  # How long (in milliseconds) to wait for the SSH handshake to complete.
         
