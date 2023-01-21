@@ -256,20 +256,6 @@ vXx20C6s4dibtc+vgtep3IV8VDxsOIoTAwmryQ==
         <certificate>fwtest1-untrusted-certificate</certificate>
       </entry>
     </ssl-tls-service-profile>
-    <local-user-database>
-      <user>
-        <entry name="jtudong">
-          <phash>$5$lbrwccnb$5C.C8q1Qxwi7vW/4ksCy97LIpHYFc6QZCXyL5QY65e3</phash>
-        </entry>
-      </user>
-      <user-group>
-        <entry name="group-all-local">
-          <user>
-            <member>jtudong</member>
-          </user>
-        </entry>
-      </user-group>
-    </local-user-database>
     <authentication-profile/>
     <ssl-decrypt>
       <trusted-root-CA>
