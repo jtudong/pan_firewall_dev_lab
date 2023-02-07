@@ -19,6 +19,7 @@ az deployment group create -c -g sfc-fwtest1-sandbox-rg -f firewall.json -p fire
 
 az pipelines run -p pan-firewall-dev-lab --name pipeline_single_firewall --branch development --open
 az pipelines run -p pan-firewall-dev-lab --name pipeline_single_firewall --branch master --open
+az pipelines runs list -p pan-firewall-dev-lab
 
 git switch master&&git merge development&&git push&&git push github&&git switch development
 
