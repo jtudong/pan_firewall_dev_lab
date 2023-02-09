@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<config version="10.1.0" urldb="paloaltonetworks" detail-version="10.1.8">
+<config version="10.1.0" urldb="paloaltonetworks" detail-version="10.1.9">
   <mgt-config>
     <users>
       <entry name="admin">
@@ -19,6 +19,14 @@
           </role-based>
         </permissions>
         <public-key>c3NoLXJzYSBBQUFBQjNOemFDMXljMkVBQUFBREFRQUJBQUFDQVFERXJ3cFg2bWFjbnlBVVcyeDVXWHRaa3lPcENCN0JTaGhDaklrM3FmZjJFTjAxZHFqS0oybUl3QzBOanczcU1oUEZpOFhrU0hNNVVSS3A5T0ZuWUtWUVhDNitPS1Qydm1ldzdUaU5wNGNiMzhRSGtWaElCMUF4NXNZcG40bXpSUjhjN2dOMStyd3g1QmxEL29Wc3p0NFRuWE5sMXQ2ck5zUmJYUDZwU3FjUGhXQ3QrVWFNdzNxVHNxZWMzNmlnQjU1a2tQTFNoblM4dFdDU1IvRUFQYW1aMnBnbFZHaW5OWjlYQzh2dTNNNDh4MFBMRzJ5RjBKSDdGaGF6TEZGK1JEK1M4V3RlZktManVzVWtnc0NsaEFLMDE3aHFORHJNQXVDTlpPb0IvMi9qdktxaXd4WG9lamdBdjRNczUvT0RZYWxPK3oxWktvU0pVTHh5TWx4RmJwNDEzSzRwN0hyMUVHVDJPSDB0RGtPM0pzMDFqdGNsbWwzc1VEeFJoOEs0cHlmcFVWdFY0UDF2blc5R0JBRFcrUDVTMnVuYktUS24yckRlQzFBckk0SkRtbEt0YnVvbnJKM2JxRzhUNGJTQWV3a2s4TnpqeXIwUkpZK2NmNXlCUjFONnlJYlZITEdxd1BlNjQxallxcjEwbytVelVpODRLNHNLK0U5Y0xndGFyakJYRDMrOFE3dWN1SUdTRStCTExzSWU3cUZOc3FWY0MxTkJLc1pIVFNOdTRFTjcyaWY4N3NSUlg0WlpyQmV3cVVMNnhsWm51L01Vc1ZGUHc3Mk5OVXhHWGQ5dUFvRWw2WjUrZ3lBa09yUHJCZDFlRVdOSzZmakdtVDJjT0M0bW9ZdXZzUVp3Q3E3Um53c0xSam9ETnZyRGsxOTVDOXh3OHdiVHV2WDRrY3JaZnc9PSBsaW51eHVzZXIK</public-key>
+      </entry>
+      <entry name="localadmin">
+        <phash>$5$cnsnovgf$RAMI.JR/iCo5YX.QJKslbVwzMRz/JnMTwfNRJ9kYpL7</phash>
+        <permissions>
+          <role-based>
+            <superuser>yes</superuser>
+          </role-based>
+        </permissions>
       </entry>
     </users>
     <password-complexity>
@@ -256,20 +264,6 @@ vXx20C6s4dibtc+vgtep3IV8VDxsOIoTAwmryQ==
         <certificate>fwtest1-untrusted-certificate</certificate>
       </entry>
     </ssl-tls-service-profile>
-    <local-user-database>
-      <user>
-        <entry name="jtudong">
-          <phash>$5$lbrwccnb$5C.C8q1Qxwi7vW/4ksCy97LIpHYFc6QZCXyL5QY65e3</phash>
-        </entry>
-      </user>
-      <user-group>
-        <entry name="group-all-local">
-          <user>
-            <member>jtudong</member>
-          </user>
-        </entry>
-      </user-group>
-    </local-user-database>
     <authentication-profile/>
     <ssl-decrypt>
       <trusted-root-CA>
@@ -753,7 +747,7 @@ vXx20C6s4dibtc+vgtep3IV8VDxsOIoTAwmryQ==
             <hostname-type-in-syslog>FQDN</hostname-type-in-syslog>
             <initcfg>
               <hostname>aw3lpaltest01</hostname>
-              <username>sfcadmin</username>
+              <username>localadmin</username>
               <type>
                 <dhcp-client>
                   <send-hostname>yes</send-hostname>
