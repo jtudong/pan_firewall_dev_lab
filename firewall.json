@@ -377,7 +377,7 @@
             "properties": {
                 "publicIPAllocationMethod": "Static",
                 "dnsSettings": {
-                    "domainNameLabel": "[if(not(empty(variables('mgmtPrefix'))),json(concat('\"',variables('mgmtPrefix'),'\"')),concat('fwmgmt', variables('uniqueId')))]"
+                    "domainNameLabel": "[concat(parameters('fwName'),'-mgmt')]"
                 }
             }
         },
@@ -394,7 +394,7 @@
             "properties": {
                 "publicIPAllocationMethod": "Static",
                 "dnsSettings": {
-                    "domainNameLabel": "[if(not(empty(variables('untrustPrefix'))),json(concat('\"',variables('untrustPrefix'),'\"')),concat('fwuntrust', variables('uniqueId')))]"
+                    "domainNameLabel": "[parameters('fwName')]"
                 }
             }
         },
