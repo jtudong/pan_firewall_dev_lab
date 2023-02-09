@@ -14,8 +14,10 @@ watch 'az group list -o table | grep fwtest'
 
 az group create -l westus3 -n sfc-fwtest1-sandbox-rg --tags Application=network Team=networking Department=it Environment=sandbox
 az deployment group validate -g sfc-fwtest1-sandbox-rg -f firewall.json -p firewall.parameters.jsonc
-az deployment group create -c -g sfc-fwtest1-sandbox-rg -f firewall.json -p firewall.parameters.jsonc adminPassword= \
+az deployment group create -c -g sfc-fwtest1-sandbox-rg -f firewall.json -p firewall.parameters.jsonc adminPassword=$adminPassword \
   -n fwtest1-2023
+az deployment group create -c -g sfc-fwtest1-sandbox-rg -f certserver.json -p adminPassword=$adminPassword \
+  -n fwtest1-2023$deployment
 
 az pipelines run -p pan-firewall-dev-lab --name pipeline_single_firewall --branch development --open
 az pipelines run -p pan-firewall-dev-lab --name pipeline_single_firewall --branch master --open
@@ -23,10 +25,10 @@ az pipelines runs list -p pan-firewall-dev-lab
 
 git switch master&&git merge development&&git push&&git push github&&git switch development
 
-ssh-keygen -f "/home/linuxuser/.ssh/known_hosts" -R "fwtest1-management.westus3.cloudapp.azure.com"
-ssh-keygen -f "/home/linuxuser/.ssh/known_hosts" -R "[fwtest1-untrusted.westus3.cloudapp.azure.com]:6622"
-ssh -o StrictHostKeyChecking=no sfcadmin@fwtest1-management.westus3.cloudapp.azure.com
-ssh -o StrictHostKeyChecking=no localadmin@fwtest1-untrusted.westus3.cloudapp.azure.com -p 6622
+ssh-keygen -f "/home/linuxuser/.ssh/known_hosts" -R "aw3lpaltest01-mgmt.westus3.cloudapp.azure.com"
+ssh-keygen -f "/home/linuxuser/.ssh/known_hosts" -R "[aw3lpaltest01.westus3.cloudapp.azure.com]:6622"
+ssh -o StrictHostKeyChecking=no sfcadmin@aw3lpaltest01-mgmt.westus3.cloudapp.azure.com
+ssh -o StrictHostKeyChecking=no localadmin@aw3lpaltest01.westus3.cloudapp.azure.com -p 6622
 
 # Resource ID example
 

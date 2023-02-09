@@ -1,0 +1,309 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "adminUsername": {
+            "type": "string",
+            "defaultValue": "localadmin"
+        },
+        "adminPassword": {
+            "type": "securestring",
+            "defaultValue": ""
+        },
+        "domainNameLabel": {
+            "type": "string",
+            "defaultValue": "aw3lpaltest01-mgmt"
+        },
+        "environment": {
+            "type": "string",
+            "defaultValue": "dev",
+            "allowedValues": [
+                "prod",
+                "dev",
+                "sandbox"
+            ]
+        },
+        "location": {
+            "type": "string",
+            "defaultValue": "westus3",
+            "allowedValues": [
+                "westus",
+                "westus2",
+                "westus3"
+            ]
+        },
+        "osDiskType": {
+            "type": "string",
+            "defaultValue": "Standard_LRS"
+        },
+        "serverVmName": {
+            "type": "string",
+            "defaultValue": "aw3lfwtest02"
+        },
+        "serverVmSize": {
+            "type": "string",
+            "defaultValue": "Standard_B2s",
+            "allowedValues": [
+                "Standard_B1s",
+                "Standard_B2s",
+                "Standard_B2ms",
+                "Standard_DS1_v2",
+                "Standard_DS2_v3"
+            ]
+        }
+    },
+    "functions": [],
+    "variables": {
+        "tags": {
+            "Department": "it",
+            "Team": "networking",
+            "Environment": "[parameters('environment')]",
+            "Application": "[parameters('serverVmName')]"
+        },
+        "uniqueId": "[uniqueString(resourceGroup().id)]",
+        "storageAccountName": "[concat(parameters('serverVmName'),skip(variables('uniqueId'),5),'sa')]"
+    },
+    "resources": [
+        {
+            //  storage account
+            //
+            "name": "[variables('storageAccountName')]",
+            "type": "Microsoft.Storage/storageAccounts",
+            "apiVersion": "2021-04-01",
+            "tags": "[variables('tags')]",
+            "location": "[parameters('location')]",
+            "kind": "StorageV2",
+            "sku": {
+                "name": "Standard_LRS",
+                "tier": "Standard"
+            }
+        },
+        {
+            // PIP
+            //
+            "name": "[concat(parameters('serverVmName'),'-',parameters('environment'),'-pip')]",
+            "type": "Microsoft.Network/publicIPAddresses",
+            "apiVersion": "2020-11-01",
+            "tags": "[variables('tags')]",
+            "location": "[parameters('location')]",
+            "sku": {
+                "name": "Standard"
+            },
+            "properties": {
+                "publicIPAllocationMethod": "Static",
+                "dnsSettings": {
+                    "domainNameLabel": "[parameters('domainNameLabel')]"
+                }
+            }
+        },
+        {
+            // untrust NSG
+            //
+            "name": "[concat(parameters('serverVmName'),'-',parameters('environment'),'-nsg')]",
+            "type": "Microsoft.Network/networkSecurityGroups",
+            "apiVersion": "2020-11-01",
+            "tags": "[variables('tags')]",
+            "location": "[parameters('location')]",
+            "properties": {
+                "securityRules": [
+                    {
+                        "name": "Allow443And80InBound",
+                        "type": "Microsoft.Network/networkSecurityGroups/securityRules",
+                        "properties": {
+                            "description": "Allow443And80InBound",
+                            "protocol": "*",
+                            "sourcePortRange": "*",
+                            "destinationAddressPrefix": "*",
+                            "sourceAddressPrefix": "*",
+                            "access": "Allow",
+                            "priority": 1100,
+                            "direction": "Inbound",
+                            "sourcePortRanges": [],
+                            "destinationPortRanges": [
+                                "443",
+                                "80"
+                            ],
+                            "sourceAddressPrefixes": [
+                            ],
+                            "destinationAddressPrefixes": []
+                        }
+                    },
+                    {
+                        "name": "AllowSSH",
+                        "properties": {
+                            "description": "AllowSSH",
+                            "protocol": "Tcp",
+                            "sourcePortRange": "*",
+                            "destinationAddressPrefix": "*",
+                            "access": "Allow",
+                            "priority": 1200,
+                            "direction": "Inbound",
+                            "sourceAddressPrefixes": [
+                                "63.156.58.20/32",
+                                "4.1.98.242/32",
+                                "72.208.101.143/32"
+                            ],
+                            "destinationPortRanges": [
+                                "22"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "AllowICMP",
+                        "properties": {
+                            "protocol": "Icmp",
+                            "sourceAddressPrefixes": [
+                                "63.156.58.20/32",
+                                "4.1.98.242/32",
+                                "72.208.101.143/32"
+                            ],
+                            "sourcePortRange": "*",
+                            "destinationAddressPrefix": "*",
+                            "destinationPortRange": "*",
+                            "access": "Allow",
+                            "direction": "Inbound",
+                            "priority": 1230
+                        }
+                    },
+                    {
+                        "name": "DenyAnyInBound",
+                        "type": "Microsoft.Network/networkSecurityGroups/securityRules",
+                        "properties": {
+                            "description": "DenyAnyInBound",
+                            "protocol": "*",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "*",
+                            "sourceAddressPrefix": "*",
+                            "destinationAddressPrefix": "*",
+                            "access": "Deny",
+                            "priority": 4095,
+                            "direction": "Inbound",
+                            "sourcePortRanges": [],
+                            "destinationPortRanges": [],
+                            "sourceAddressPrefixes": [],
+                            "destinationAddressPrefixes": []
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            // Vnet
+            //
+            "name": "[concat(parameters('serverVmName'),'-',parameters('environment'),'-vnet')]",
+            "type": "Microsoft.Network/virtualNetworks",
+            "apiVersion": "2020-11-01",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/networkSecurityGroups', concat(parameters('serverVmName'),'-',parameters('environment'),'-nsg'))]"
+            ],
+            "location": "[parameters('location')]",
+            "tags": "[variables('tags')]",
+            "properties": {
+                "addressSpace": {
+                    "addressPrefixes": [
+                        "10.18.0.0/16"
+                    ]
+                },
+                "subnets": [
+                    {
+                        "name": "Subnet-1",
+                        "properties": {
+                            "addressPrefix": "10.18.0.0/24",
+                            "networkSecurityGroup": {
+                                "id": "[resourceId('Microsoft.Network/networkSecurityGroups',concat(parameters('serverVmName'),'-',parameters('environment'),'-nsg'))]"
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            // NIC
+            //
+            "name": "[concat(parameters('serverVmName'),'-nic')]",
+            "type": "Microsoft.Network/networkInterfaces",
+            "apiVersion": "2020-11-01",
+            "location": "[parameters('location')]",
+            "tags": "[variables('tags')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/publicIPAddresses', concat(parameters('serverVmName'),'-',parameters('environment'),'-pip'))]",
+                "[resourceId('Microsoft.Network/virtualNetworks', concat(parameters('serverVmName'),'-',parameters('environment'),'-vnet'))]"
+            ],
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "ipConfig1",
+                        "properties": {
+                            "privateIPAllocationMethod": "Dynamic",
+                            "subnet": {
+                                "id":"[resourceId('Microsoft.Network/virtualNetworks/subnets',concat(parameters('serverVmName'),'-',parameters('environment'),'-vnet'),'Subnet-1')]"
+                            },
+                            "publicIPAddress": {
+                                "id": "[resourceId('Microsoft.Network/publicIPAddresses',concat(parameters('serverVmName'),'-',parameters('environment'),'-pip'))]"
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            //   server VM
+            //
+            "condition": true,
+            "name": "[parameters('serverVmName')]",
+            "type": "Microsoft.Compute/virtualMachines",
+            "apiVersion": "2021-03-01",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/networkInterfaces', concat(parameters('serverVmName'),'-nic'))]",
+                "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]"
+            ],
+            "tags": "[variables('tags')]",
+            "properties": {
+                "hardwareProfile": {
+                    "vmSize": "[parameters('serverVmSize')]"
+                },
+                "storageProfile": {
+                    "osDisk": {
+                        "name": "[concat(parameters('serverVmName'),'-OSDisk')]",
+                        "caching": "ReadWrite",
+                        "createOption": "fromImage",
+                        "managedDisk": {
+                            "storageAccountType": "[parameters('osDiskType')]"
+                        }
+                    },
+                    "imageReference": {
+                        "publisher": "Canonical",
+                        "offer": "0001-com-ubuntu-server-jammy",
+                        "sku": "22_04-lts",
+                        "version": "latest"
+                    }
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces',concat(parameters('serverVmName'),'-nic'))]"
+                        }
+                    ]
+                },
+                "osProfile": {
+                    "computerName": "[parameters('serverVmName')]",
+                    "adminUsername": "[parameters('adminUsername')]",
+                    "adminPassword": "[parameters('adminPassword')]",
+                    "linuxConfiguration": {
+                        "patchSettings": {
+                            "patchMode": "ImageDefault"
+                        }
+                    }
+                },
+                "diagnosticsProfile": {
+                    "bootDiagnostics": {
+                        "enabled": true,
+                        "storageUri": "[concat('https://',variables('storageAccountName'),'.blob.core.windows.net/')]"
+                    }
+                }
+            }
+        }
+    ],
+    "outputs": {}
+}
