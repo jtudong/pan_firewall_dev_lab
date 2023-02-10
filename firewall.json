@@ -664,6 +664,12 @@
                             }
                         }
                     ]
+                },
+                "diagnosticsProfile": {
+                    "bootDiagnostics": {
+                        "enabled": true,
+                        "storageUri": "[concat('https://',variables('storageAccountName'),'blob.core.windows.net')]"
+                    }
                 }
             }
         },
@@ -796,6 +802,10 @@
         "trusted-subnet": {
             "type": "string",
             "value": "[concat(parameters('subnetPrefixTrusted'),'.0')]"
+        },
+        "storage-uri": {
+            "type": "string",
+            "value": "[reference(resourceId('Microsoft.Compute/virtualMachines',parameters('fwName'))).diagnosticsProfile.bootDiagnostics.storageUri]"
         }
     }
 }
