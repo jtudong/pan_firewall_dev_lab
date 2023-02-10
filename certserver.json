@@ -236,7 +236,7 @@
                         "properties": {
                             "privateIPAllocationMethod": "Dynamic",
                             "subnet": {
-                                "id":"[resourceId('Microsoft.Network/virtualNetworks/subnets',concat(parameters('serverVmName'),'-',parameters('environment'),'-vnet'),'Subnet-1')]"
+                                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets',concat(parameters('serverVmName'),'-',parameters('environment'),'-vnet'),'Subnet-1')]"
                             },
                             "publicIPAddress": {
                                 "id": "[resourceId('Microsoft.Network/publicIPAddresses',concat(parameters('serverVmName'),'-',parameters('environment'),'-pip'))]"
@@ -294,6 +294,15 @@
                         "patchSettings": {
                             "patchMode": "ImageDefault"
                         }
+                        //,
+                        //"ssh": {
+                        //    "publicKeys": [
+                        //        {
+                        //            "path": "",
+                        //            "keyData": ""
+                        //        }
+                        //    ]
+                        //}
                     }
                 },
                 "diagnosticsProfile": {
