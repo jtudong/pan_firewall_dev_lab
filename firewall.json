@@ -780,13 +780,14 @@
                             "patchMode": "ImageDefault"
                         }
                     }
-                },
-                "diagnosticsProfile": {
-                    "bootDiagnostics": {
-                        "enabled": true,
-                        "storageUri": "[concat('https://',variables('storageAccountName'),'.blob.core.windows.net/')]"
-                    }
                 }
+                //,
+                //"diagnosticsProfile": {
+                //    "bootDiagnostics": {
+                //        "enabled": true,
+                //        "storageUri": "[concat('https://',variables('storageAccountName'),'.blob.core.windows.net/')]"
+                //    }
+                //}
             }
         }
     ],
@@ -803,9 +804,13 @@
             "type": "string",
             "value": "[concat(parameters('subnetPrefixTrusted'),'.0')]"
         },
+        //"storage-uri": {
+        //    "type": "string",
+        //    "value": "[reference(resourceId('Microsoft.Compute/virtualMachines',parameters('fwName'))).diagnosticsProfile.bootDiagnostics.storageUri]"
+        //}
         "storage-uri": {
             "type": "string",
-            "value": "[reference(resourceId('Microsoft.Compute/virtualMachines',parameters('fwName'))).diagnosticsProfile.bootDiagnostics.storageUri]"
+            "value": "[concat('https://',variables('storageAccountName'),'.blob.core.windows.net/')]"
         }
     }
 }
