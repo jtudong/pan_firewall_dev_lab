@@ -39,7 +39,7 @@ rsync -avP sfcadmin@aw3lpaltest01-mgmt.westus3.cloudapp.azure.com:/home/sfcadmin
 ls -l docs/certificates/aw3lpaltest01-mgmt/
 
 # certificate server setup - public
-az deployment group create -c -g sfc-fwtest1-sandbox-rg -f certserver.json -p adminPassword=$adminPassword -n fwtest1-2023$deployment 
+az deployment group create -c -g sfc-fwtest1-sandbox-rg -f certserver.json -p adminPassword=$adminPassword domainNameLabel=aw3lpaltest01 -n fwtest1-2023$deployment 
 apt update && apt install nginx -y && snap install core && snap refresh core && snap install --classic certbot
 ln -s /snap/bin/certbot /usr/bin/certbot
 certbot certonly --nginx -d aw3lpaltest01.westus3.cloudapp.azure.com
