@@ -377,7 +377,7 @@
             "properties": {
                 "publicIPAllocationMethod": "Static",
                 "dnsSettings": {
-                    "domainNameLabel": "[if(not(empty(variables('mgmtPrefix'))),json(concat('\"',variables('mgmtPrefix'),'\"')),concat('fwmgmt', variables('uniqueId')))]"
+                    "domainNameLabel": "[concat(parameters('fwName'),'-mgmt')]"
                 }
             }
         },
@@ -394,7 +394,7 @@
             "properties": {
                 "publicIPAllocationMethod": "Static",
                 "dnsSettings": {
-                    "domainNameLabel": "[if(not(empty(variables('untrustPrefix'))),json(concat('\"',variables('untrustPrefix'),'\"')),concat('fwuntrust', variables('uniqueId')))]"
+                    "domainNameLabel": "[parameters('fwName')]"
                 }
             }
         },
@@ -664,6 +664,12 @@
                             }
                         }
                     ]
+                },
+                "diagnosticsProfile": {
+                    "bootDiagnostics": {
+                        "enabled": true,
+                        "storageUri": "[concat('https://',variables('storageAccountName'),'.blob.core.windows.net')]"
+                    }
                 }
             }
         },
@@ -774,13 +780,14 @@
                             "patchMode": "ImageDefault"
                         }
                     }
-                },
-                "diagnosticsProfile": {
-                    "bootDiagnostics": {
-                        "enabled": true,
-                        "storageUri": "[concat('https://',variables('storageAccountName'),'.blob.core.windows.net/')]"
-                    }
                 }
+                //,
+                //"diagnosticsProfile": {
+                //    "bootDiagnostics": {
+                //        "enabled": true,
+                //        "storageUri": "[concat('https://',variables('storageAccountName'),'.blob.core.windows.net/')]"
+                //    }
+                //}
             }
         }
     ],
@@ -796,6 +803,14 @@
         "trusted-subnet": {
             "type": "string",
             "value": "[concat(parameters('subnetPrefixTrusted'),'.0')]"
+        },
+        //"storage-uri": {
+        //    "type": "string",
+        //    "value": "[reference(resourceId('Microsoft.Compute/virtualMachines',parameters('fwName'))).diagnosticsProfile.bootDiagnostics.storageUri]"
+        //}
+        "storage-uri": {
+            "type": "string",
+            "value": "[concat('https://',variables('storageAccountName'),'.blob.core.windows.net/')]"
         }
     }
 }
