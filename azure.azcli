@@ -33,9 +33,9 @@ az deployment group create -c -g sfc-fwtest1-sandbox-rg -f certserver.json -p ad
 apt update && apt install nginx -y && snap install core && snap refresh core && snap install --classic certbot
 ln -s /snap/bin/certbot /usr/bin/certbot
 certbot certonly --nginx -d aw3lpaltest01-mgmt.westus3.cloudapp.azure.com
-cp /etc/letsencrypt/live/aw3lpaltest01-mgmt.westus3.cloudapp.azure.com/*.pem /home/sfcadmin
-chown sfcadmin:sfcadmin *.pem
-rsync -avP sfcadmin@aw3lpaltest01-mgmt.westus3.cloudapp.azure.com:/home/sfcadmin/*.pem docs/certificates/aw3lpaltest01-mgmt/
+cp /etc/letsencrypt/live/aw3lpaltest01-mgmt.westus3.cloudapp.azure.com/*.pem /home/localadmin
+chown localadmin:localadmin *.pem
+rsync -avP localadmin@aw3lpaltest01-mgmt.westus3.cloudapp.azure.com:/home/localadmin/*.pem docs/certificates/aw3lpaltest01-mgmt/
 ls -l docs/certificates/aw3lpaltest01-mgmt/
 
 # certificate server setup - public
@@ -45,9 +45,9 @@ ssh-keygen -f "/home/linuxuser/.ssh/known_hosts" -R "aw3lpaltest01.westus3.cloud
 apt update && apt install nginx -y && snap install core && snap refresh core && snap install --classic certbot
 ln -s /snap/bin/certbot /usr/bin/certbot
 certbot certonly --nginx -d aw3lpaltest01.westus3.cloudapp.azure.com
-cp /etc/letsencrypt/live/aw3lpaltest01.westus3.cloudapp.azure.com/*.pem /home/sfcadmin
-chown sfcadmin:sfcadmin *.pem
-rsync -avP sfcadmin@aw3lpaltest01.westus3.cloudapp.azure.com:/home/sfcadmin/*.pem docs/certificates/aw3lpaltest01/
+cp /etc/letsencrypt/live/aw3lpaltest01.westus3.cloudapp.azure.com/*.pem /home/localadmin
+chown localadmin:localadmin *.pem
+rsync -avP localadmin@aw3lpaltest01.westus3.cloudapp.azure.com:/home/localadmin/*.pem docs/certificates/aw3lpaltest01/
 ls -l docs/certificates/aw3lpaltest01/
 
 # Resource ID example
