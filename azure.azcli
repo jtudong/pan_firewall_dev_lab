@@ -21,7 +21,7 @@ az pipelines run -p pan-firewall-dev-lab --name pipeline_single_firewall --branc
 az pipelines runs list -p pan-firewall-dev-lab
 az pipelines list -p pan-firewall-dev-lab
 
-git switch master&&git merge development&&git push&&git push github&&git switch development
+git switch master&&git merge development&&git push&git switch development
 
 ssh-keygen -f "/home/linuxuser/.ssh/known_hosts" -R "aw3lpaltest01-mgmt.westus3.cloudapp.azure.com"
 ssh-keygen -f "/home/linuxuser/.ssh/known_hosts" -R "[aw3lpaltest01.westus3.cloudapp.azure.com]:6622"
