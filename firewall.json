@@ -454,7 +454,67 @@
             }
         },
         {
-			// Create the Vnet
+            "name": "dc-subnet-rt",
+            "type": "Microsoft.Network/routeTables",
+            "apiVersion": "2020-11-01",
+            "location": "[resourceGroup().location]",
+            "tags": {},
+            "properties": {
+                "routes": [
+                    {
+                        "name": "internet-forced-firewall",
+                        "properties": {
+                            "addressPrefix": "0.0.0.0/0",
+                            "nextHopType": "VirtualAppliance",
+                            "nextHopIpAddress": "10.18.9.4",
+                            "hasBgpOverride": false
+                        }
+                    },
+                    {
+                        "name": "local-forced-firewall",
+                        "properties": {
+                            "addressPrefix": "10.18.0.0/16",
+                            "nextHopType": "VirtualAppliance",
+                            "nextHopIpAddress": "10.18.9.4",
+                            "hasBgpOverride": false
+                        }
+                    }
+                ],
+                "disableBgpRoutePropagation": true
+            }
+        },
+        {
+            "name": "agent-subnet-rt",
+            "type": "Microsoft.Network/routeTables",
+            "apiVersion": "2020-11-01",
+            "location": "[resourceGroup().location]",
+            "tags": {},
+            "properties": {
+                "routes": [
+                    {
+                        "name": "internet-forced-firewall",
+                        "properties": {
+                            "addressPrefix": "0.0.0.0/0",
+                            "nextHopType": "VirtualAppliance",
+                            "nextHopIpAddress": "10.18.9.4",
+                            "hasBgpOverride": false
+                        }
+                    },
+                    {
+                        "name": "local-forced-firewall",
+                        "properties": {
+                            "addressPrefix": "10.18.0.0/16",
+                            "nextHopType": "VirtualAppliance",
+                            "nextHopIpAddress": "10.18.9.4",
+                            "hasBgpOverride": false
+                        }
+                    }
+                ],
+                "disableBgpRoutePropagation": true
+            }
+        },
+        {
+            // Create the Vnet
             "name": "[concat(parameters('subnetPrefixName'),'-',parameters('environment'),'-vnet')]",
             "type": "Microsoft.Network/virtualNetworks",
             "apiVersion": "2020-11-01",
@@ -466,7 +526,7 @@
                 "[resourceId('Microsoft.Network/routeTables', concat(parameters('subnetPrefixName'),'-trusted-rt'))]",
                 "[resourceId('Microsoft.Network/routeTables', concat(parameters('subnetPrefixName'),'-untrusted-rt'))]"
             ],
-			"tags": "[variables('tags')]",
+            "tags": "[variables('tags')]",
             "location": "[parameters('location')]",
             "properties": {
                 "addressSpace": {
@@ -508,6 +568,24 @@
                             },
                             "routeTable": {
                                 "id": "[resourceId('Microsoft.Network/routeTables',concat(parameters('subnetPrefixName'),'-trusted-rt'))]"
+                            }
+                        }
+                    },
+                    {
+                        "name": "dc-subnet",
+                        "properties": {
+                            "addressPrefix": "10.18.10.0/27",
+                            "routeTable": {
+                                "id": "[resourceId('Microsoft.Network/routeTables','dc-subnet-rt')]"
+                            }
+                        }
+                    },
+                    {
+                        "name": "agent-subnet",
+                        "properties": {
+                            "addressPrefix": "10.18.10.32/27",
+                            "routeTable": {
+                                "id": "[resourceId('Microsoft.Network/routeTables','agent-subnet-rt')]"
                             }
                         }
                     }
@@ -624,7 +702,7 @@
                 "osProfile": {
                     "computerName": "[parameters('fwName')]",
                     "adminUsername": "[parameters('adminUsername')]",
-                    "adminPassword": "[parameters('adminPassword')]" ,
+                    "adminPassword": "[parameters('adminPassword')]",
                     "customData": "[base64(variables('customData'))]"
                 },
                 "storageProfile": {
