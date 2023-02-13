@@ -682,7 +682,8 @@
             "name": "[parameters('fwName')]",
             "type": "Microsoft.Compute/virtualMachines",
             "apiVersion": "2021-03-01",
-            "condition": "[parameters('deployFirewall')]",
+            "condition": false,
+            //"condition": "[parameters('deployFirewall')]",
             "tags": "[variables('tags')]",
             "location": "[parameters('location')]",
             "dependsOn": [
@@ -812,7 +813,7 @@
         {
             //  create the server VM
             //
-            "condition": true,
+            "condition": false,
             "name": "[parameters('serverVmName')]",
             "type": "Microsoft.Compute/virtualMachines",
             "apiVersion": "2021-03-01",
