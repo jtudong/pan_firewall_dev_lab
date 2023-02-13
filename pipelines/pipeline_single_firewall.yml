@@ -6,7 +6,7 @@ trigger:
   paths:
     exclude:
       - "pipelines/*.yml"
-      - docs/README.md
+      - "docs/*"
       - "config/*"
       - "license/*"
       - "*.azcli"
