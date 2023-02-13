@@ -313,6 +313,28 @@
                         }
                     },
                     {
+                        "name": "AllowInsideServices",
+                        "properties": {
+                            "description": "AllowInsideServices",
+                            "protocol": "Tcp",
+                            "sourcePortRange": "*",
+                            "destinationAddressPrefix": "*",
+                            "access": "Allow",
+                            "priority": 1200,
+                            "direction": "Inbound",
+                            "sourceAddressPrefixes": [
+                                "63.156.58.20/32",
+                                "4.1.98.242/32",
+                                "72.208.101.143/32"
+                            ],
+                            "destinationPortRanges": [
+                                "22",
+                                "6622",
+                                "3390"
+                            ]
+                        }
+                    },
+                    {
                         "name": "DenyAnyInBound",
                         "type": "Microsoft.Network/networkSecurityGroups/securityRules",
                         "properties": {
