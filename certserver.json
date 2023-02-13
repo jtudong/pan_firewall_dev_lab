@@ -11,8 +11,21 @@
             "defaultValue": ""
         },
         "domainNameLabel": {
-            "type": "string",
-            "defaultValue": "aw3lpaltest01-mgmt"
+            "type": "object",
+            "defaultValue": {
+                "dnsNames": [
+                    {
+                        "name": "aw3lpaltest01-mgmt"
+                    },
+                    {
+                        "name": "aw3lpaltest01"
+                    }
+                ]
+            }
+        //    "defaultValue": [
+        //        "aw3lpaltest01-mgmt",
+        //        "aw3lpaltest01"
+        //        ]
         },
         "environment": {
             "type": "string",
@@ -35,6 +48,10 @@
         "osDiskType": {
             "type": "string",
             "defaultValue": "Standard_LRS"
+        },
+        "serverCount": {
+            "type": "int",
+            "defaultValue": 2
         },
         "serverVmName": {
             "type": "string",
@@ -61,7 +78,8 @@
             "Application": "[parameters('serverVmName')]"
         },
         "uniqueId": "[uniqueString(resourceGroup().id)]",
-        "storageAccountName": "[concat(parameters('serverVmName'),skip(variables('uniqueId'),5),'sa')]"
+        "storageAccountName": "[concat(parameters('serverVmName'),skip(variables('uniqueId'),5),'sa')]",
+        "prefixName": "[concat(parameters('serverVmName'),'-',parameters('environment'),'-')]"
     },
     "resources": [
         {
@@ -81,7 +99,7 @@
         {
             // PIP
             //
-            "name": "[concat(parameters('serverVmName'),'-',parameters('environment'),'-pip')]",
+            "name": "[concat(variables('prefixName'),copyIndex('pip'),'-pip')]",
             "type": "Microsoft.Network/publicIPAddresses",
             "apiVersion": "2020-11-01",
             "tags": "[variables('tags')]",
@@ -92,14 +110,18 @@
             "properties": {
                 "publicIPAllocationMethod": "Static",
                 "dnsSettings": {
-                    "domainNameLabel": "[parameters('domainNameLabel')]"
+                    "domainNameLabel": "[parameters('domainNameLabel').dnsNames[copyIndex('pip')].name]"
                 }
+            },
+            "copy": {
+                "count": "[parameters('serverCount')]",
+                "name": "pip"
             }
         },
         {
             // untrust NSG
             //
-            "name": "[concat(parameters('serverVmName'),'-',parameters('environment'),'-nsg')]",
+            "name": "[concat(variables('prefixName'),'nsg')]",
             "type": "Microsoft.Network/networkSecurityGroups",
             "apiVersion": "2020-11-01",
             "tags": "[variables('tags')]",
@@ -194,7 +216,7 @@
             "type": "Microsoft.Network/virtualNetworks",
             "apiVersion": "2020-11-01",
             "dependsOn": [
-                "[resourceId('Microsoft.Network/networkSecurityGroups', concat(parameters('serverVmName'),'-',parameters('environment'),'-nsg'))]"
+                "[resourceId('Microsoft.Network/networkSecurityGroups', concat(variables('prefixName'),'nsg'))]"
             ],
             "location": "[parameters('location')]",
             "tags": "[variables('tags')]",
@@ -210,7 +232,7 @@
                         "properties": {
                             "addressPrefix": "10.18.0.0/24",
                             "networkSecurityGroup": {
-                                "id": "[resourceId('Microsoft.Network/networkSecurityGroups',concat(parameters('serverVmName'),'-',parameters('environment'),'-nsg'))]"
+                                "id": "[resourceId('Microsoft.Network/networkSecurityGroups',concat(variables('prefixName'),'nsg'))]"
                             }
                         }
                     }
@@ -220,14 +242,14 @@
         {
             // NIC
             //
-            "name": "[concat(parameters('serverVmName'),'-nic')]",
+            "name": "[concat(variables('prefixName'),copyIndex('nic'),'-nic')]",
             "type": "Microsoft.Network/networkInterfaces",
             "apiVersion": "2020-11-01",
             "location": "[parameters('location')]",
             "tags": "[variables('tags')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Network/publicIPAddresses', concat(parameters('serverVmName'),'-',parameters('environment'),'-pip'))]",
-                "[resourceId('Microsoft.Network/virtualNetworks', concat(parameters('serverVmName'),'-',parameters('environment'),'-vnet'))]"
+                "[resourceId('Microsoft.Network/publicIPAddresses', concat(variables('prefixName'),copyIndex('nic'),'-pip'))]",
+                "[resourceId('Microsoft.Network/virtualNetworks', concat(variables('prefixName'),'vnet'))]"
             ],
             "properties": {
                 "ipConfigurations": [
@@ -236,26 +258,30 @@
                         "properties": {
                             "privateIPAllocationMethod": "Dynamic",
                             "subnet": {
-                                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets',concat(parameters('serverVmName'),'-',parameters('environment'),'-vnet'),'Subnet-1')]"
+                                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets',concat(variables('prefixName'),'vnet'),'Subnet-1')]"
                             },
                             "publicIPAddress": {
-                                "id": "[resourceId('Microsoft.Network/publicIPAddresses',concat(parameters('serverVmName'),'-',parameters('environment'),'-pip'))]"
+                                "id": "[resourceId('Microsoft.Network/publicIPAddresses',concat(variables('prefixName'),copyIndex('nic'),'-pip'))]"
                             }
                         }
                     }
                 ]
+            },
+            "copy": {
+                "count": "[parameters('serverCount')]",
+                "name": "nic"
             }
         },
         {
             //   server VM
             //
             "condition": true,
-            "name": "[parameters('serverVmName')]",
+            "name": "[concat(parameters('serverVmName'),copyIndex('vm'))]",
             "type": "Microsoft.Compute/virtualMachines",
             "apiVersion": "2021-03-01",
             "location": "[parameters('location')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Network/networkInterfaces', concat(parameters('serverVmName'),'-nic'))]",
+                "[resourceId('Microsoft.Network/networkInterfaces', concat(variables('prefixName'),copyIndex('vm'),'-nic'))]",
                 "[resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName'))]"
             ],
             "tags": "[variables('tags')]",
@@ -265,7 +291,7 @@
                 },
                 "storageProfile": {
                     "osDisk": {
-                        "name": "[concat(parameters('serverVmName'),'-OSDisk')]",
+                        "name": "[concat(parameters('serverVmName'),'-OSDisk',copyIndex('vm'))]",
                         "caching": "ReadWrite",
                         "createOption": "fromImage",
                         "managedDisk": {
@@ -282,7 +308,7 @@
                 "networkProfile": {
                     "networkInterfaces": [
                         {
-                            "id": "[resourceId('Microsoft.Network/networkInterfaces',concat(parameters('serverVmName'),'-nic'))]"
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces',concat(variables('prefixName'),copyIndex('vm'),'-nic'))]"
                         }
                     ]
                 },
@@ -311,8 +337,21 @@
                         "storageUri": "[concat('https://',variables('storageAccountName'),'.blob.core.windows.net/')]"
                     }
                 }
+            },
+            "copy": {
+                "count": "[parameters('serverCount')]",
+                "name": "vm"
             }
         }
     ],
-    "outputs": {}
+    "outputs": {
+        "output1": {
+            "type": "array",
+            //"value": "[parameters('domainNameLabel').dnsNames[0].name]",
+            "copy": {
+                "count": "[parameters('serverCount')]",
+                "input": "[parameters('domainNameLabel').dnsNames[copyIndex()].name]"
+            }
+        }
+    }
 }
