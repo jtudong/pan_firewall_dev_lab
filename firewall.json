@@ -871,25 +871,25 @@
         }
     ],
     "outputs": {
-        "firewall.username": {
-            "type": "string",
-            "value": "[reference(resourceId('Microsoft.Compute/virtualMachines',parameters('fwName'))).osProfile.adminUsername]"
-        },
-        "custom-data": {
-            "type": "string",
-            "value": "[variables('customData')]"
-        },
-        "trusted-subnet": {
-            "type": "string",
-            "value": "[concat(parameters('subnetPrefixTrusted'),'.0')]"
-        },
+        //"firewall.username": {
+        //    "type": "string",
+        //    "value": "[reference(resourceId('Microsoft.Compute/virtualMachines',parameters('fwName'))).osProfile.adminUsername]"
+        //},
+        //"custom-data": {
+        //    "type": "string",
+        //    "value": "[variables('customData')]"
+        //},
+        //"trusted-subnet": {
+        //    "type": "string",
+        //    "value": "[concat(parameters('subnetPrefixTrusted'),'.0')]"
+        //},
+        ////"storage-uri": {
+        ////    "type": "string",
+        ////    "value": "[reference(resourceId('Microsoft.Compute/virtualMachines',parameters('fwName'))).diagnosticsProfile.bootDiagnostics.storageUri]"
+        ////}
         //"storage-uri": {
         //    "type": "string",
-        //    "value": "[reference(resourceId('Microsoft.Compute/virtualMachines',parameters('fwName'))).diagnosticsProfile.bootDiagnostics.storageUri]"
+        //    "value": "[concat('https://',variables('storageAccountName'),'.blob.core.windows.net/')]"
         //}
-        "storage-uri": {
-            "type": "string",
-            "value": "[concat('https://',variables('storageAccountName'),'.blob.core.windows.net/')]"
-        }
     }
 }
