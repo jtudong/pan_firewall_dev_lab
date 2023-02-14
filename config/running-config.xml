@@ -21,7 +21,7 @@
         <public-key>c3NoLXJzYSBBQUFBQjNOemFDMXljMkVBQUFBREFRQUJBQUFDQVFERXJ3cFg2bWFjbnlBVVcyeDVXWHRaa3lPcENCN0JTaGhDaklrM3FmZjJFTjAxZHFqS0oybUl3QzBOanczcU1oUEZpOFhrU0hNNVVSS3A5T0ZuWUtWUVhDNitPS1Qydm1ldzdUaU5wNGNiMzhRSGtWaElCMUF4NXNZcG40bXpSUjhjN2dOMStyd3g1QmxEL29Wc3p0NFRuWE5sMXQ2ck5zUmJYUDZwU3FjUGhXQ3QrVWFNdzNxVHNxZWMzNmlnQjU1a2tQTFNoblM4dFdDU1IvRUFQYW1aMnBnbFZHaW5OWjlYQzh2dTNNNDh4MFBMRzJ5RjBKSDdGaGF6TEZGK1JEK1M4V3RlZktManVzVWtnc0NsaEFLMDE3aHFORHJNQXVDTlpPb0IvMi9qdktxaXd4WG9lamdBdjRNczUvT0RZYWxPK3oxWktvU0pVTHh5TWx4RmJwNDEzSzRwN0hyMUVHVDJPSDB0RGtPM0pzMDFqdGNsbWwzc1VEeFJoOEs0cHlmcFVWdFY0UDF2blc5R0JBRFcrUDVTMnVuYktUS24yckRlQzFBckk0SkRtbEt0YnVvbnJKM2JxRzhUNGJTQWV3a2s4TnpqeXIwUkpZK2NmNXlCUjFONnlJYlZITEdxd1BlNjQxallxcjEwbytVelVpODRLNHNLK0U5Y0xndGFyakJYRDMrOFE3dWN1SUdTRStCTExzSWU3cUZOc3FWY0MxTkJLc1pIVFNOdTRFTjcyaWY4N3NSUlg0WlpyQmV3cVVMNnhsWm51L01Vc1ZGUHc3Mk5OVXhHWGQ5dUFvRWw2WjUrZ3lBa09yUHJCZDFlRVdOSzZmakdtVDJjT0M0bW9ZdXZzUVp3Q3E3Um53c0xSam9ETnZyRGsxOTVDOXh3OHdiVHV2WDRrY3JaZnc9PSBsaW51eHVzZXIK</public-key>
       </entry>
       <entry name="localadmin">
-        <phash>$5$quhaqaks$SC.255cY6v16e8.UcWCovvU9y/fPvinBMUzZN.eXtr1</phash>
+        <phash>$5$bnpivwdk$bgkjnTQfcLnTTaH2HM4Yb5TRKNvHhGcQVg3dQqh8505</phash>
         <permissions>
           <role-based>
             <superuser>yes</superuser>
@@ -718,13 +718,22 @@ Dfvp7OOGAN6dEOM4+qR9sdjoSYKEBpsr6GtPAQw4dy753ec5
                     <bfd>
                       <profile>None</profile>
                     </bfd>
-                    <path-monitor>
-                      <enable>no</enable>
-                      <failure-condition>any</failure-condition>
-                      <hold-time>2</hold-time>
-                    </path-monitor>
                     <metric>10</metric>
                     <destination>0.0.0.0/0</destination>
+                    <route-table>
+                      <unicast/>
+                    </route-table>
+                  </entry>
+                  <entry name="dc-subnet">
+                    <nexthop>
+                      <ip-address>10.18.9.1</ip-address>
+                    </nexthop>
+                    <bfd>
+                      <profile>None</profile>
+                    </bfd>
+                    <interface>ethernet1/2</interface>
+                    <metric>10</metric>
+                    <destination>10.0.0.0/8</destination>
                     <route-table>
                       <unicast/>
                     </route-table>
@@ -870,6 +879,17 @@ Dfvp7OOGAN6dEOM4+qR9sdjoSYKEBpsr6GtPAQw4dy753ec5
                 </tcp>
               </protocol>
             </entry>
+            <entry name="TCP-3390">
+              <protocol>
+                <tcp>
+                  <port>3390</port>
+                  <override>
+                    <no/>
+                  </override>
+                </tcp>
+              </protocol>
+              <description>dc1</description>
+            </entry>
           </service>
           <service-group/>
           <schedule/>
@@ -877,7 +897,7 @@ Dfvp7OOGAN6dEOM4+qR9sdjoSYKEBpsr6GtPAQw4dy753ec5
             <default-security-rules>
               <rules>
                 <entry name="intrazone-default" uuid="24421490-76af-4032-aed7-4fbe8704d405">
-                  <action>deny</action>
+                  <action>allow</action>
                   <log-start>no</log-start>
                   <log-end>yes</log-end>
                 </entry>
@@ -927,7 +947,7 @@ Dfvp7OOGAN6dEOM4+qR9sdjoSYKEBpsr6GtPAQw4dy753ec5
                   <action>allow</action>
                   <rule-type>intrazone</rule-type>
                 </entry>
-                <entry name="Permit untrust to aw3lfwtest01" uuid="325d8f27-a7aa-4042-9b01-16d090ca5c55">
+                <entry name="Permit untrust to servers" uuid="325d8f27-a7aa-4042-9b01-16d090ca5c55">
                   <to>
                     <member>Trust</member>
                   </to>
@@ -950,6 +970,7 @@ Dfvp7OOGAN6dEOM4+qR9sdjoSYKEBpsr6GtPAQw4dy753ec5
                     <member>any</member>
                   </application>
                   <service>
+                    <member>TCP-3390</member>
                     <member>TCP-6622</member>
                   </service>
                   <source-hip>
@@ -1044,6 +1065,62 @@ Dfvp7OOGAN6dEOM4+qR9sdjoSYKEBpsr6GtPAQw4dy753ec5
                     <member>ping</member>
                     <member>ssl</member>
                     <member>web-browsing</member>
+                  </application>
+                  <service>
+                    <member>application-default</member>
+                  </service>
+                  <source-hip>
+                    <member>any</member>
+                  </source-hip>
+                  <destination-hip>
+                    <member>any</member>
+                  </destination-hip>
+                  <action>allow</action>
+                </entry>
+                <entry name="Permit Internet access for servers" uuid="ecb46004-dc8c-4504-a89b-0480fbbc82c4">
+                  <profile-setting>
+                    <profiles>
+                      <url-filtering>
+                        <member>default</member>
+                      </url-filtering>
+                      <file-blocking>
+                        <member>basic file blocking</member>
+                      </file-blocking>
+                      <virus>
+                        <member>default</member>
+                      </virus>
+                      <spyware>
+                        <member>default</member>
+                      </spyware>
+                      <vulnerability>
+                        <member>default</member>
+                      </vulnerability>
+                      <wildfire-analysis>
+                        <member>default</member>
+                      </wildfire-analysis>
+                    </profiles>
+                  </profile-setting>
+                  <to>
+                    <member>Untrust</member>
+                  </to>
+                  <from>
+                    <member>Trust</member>
+                  </from>
+                  <source>
+                    <member>10.18.0.0/27</member>
+                    <member>10.18.0.32/27</member>
+                  </source>
+                  <destination>
+                    <member>any</member>
+                  </destination>
+                  <source-user>
+                    <member>any</member>
+                  </source-user>
+                  <category>
+                    <member>any</member>
+                  </category>
+                  <application>
+                    <member>any</member>
                   </application>
                   <service>
                     <member>application-default</member>
@@ -1205,6 +1282,26 @@ Dfvp7OOGAN6dEOM4+qR9sdjoSYKEBpsr6GtPAQw4dy753ec5
                     <member>10.18.8.4</member>
                   </destination>
                   <service>TCP-6622</service>
+                  <to-interface>ethernet1/1</to-interface>
+                </entry>
+                <entry name="Inbound NAT for dc1" uuid="046b7b2b-00ac-4ffd-99b7-81c1975fc279">
+                  <destination-translation>
+                    <translated-port>3389</translated-port>
+                    <translated-address>10.18.0.4</translated-address>
+                  </destination-translation>
+                  <to>
+                    <member>Untrust</member>
+                  </to>
+                  <from>
+                    <member>Untrust</member>
+                  </from>
+                  <source>
+                    <member>any</member>
+                  </source>
+                  <destination>
+                    <member>10.18.8.4</member>
+                  </destination>
+                  <service>TCP-3390</service>
                   <to-interface>ethernet1/1</to-interface>
                 </entry>
               </rules>
