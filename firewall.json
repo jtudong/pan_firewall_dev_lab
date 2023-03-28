@@ -320,7 +320,7 @@
                             "sourcePortRange": "*",
                             "destinationAddressPrefix": "*",
                             "access": "Allow",
-                            "priority": 1200,
+                            "priority": 1240,
                             "direction": "Inbound",
                             "sourceAddressPrefixes": [
                                 "63.156.58.20/32",
