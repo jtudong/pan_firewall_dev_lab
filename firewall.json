@@ -597,7 +597,7 @@
                     {
                         "name": "dc-subnet",
                         "properties": {
-                            "addressPrefix": "10.18.10.0/27",
+                            "addressPrefix": "10.18.11.0/27",
                             "routeTable": {
                                 "id": "[resourceId('Microsoft.Network/routeTables','dc-subnet-rt')]"
                             }
@@ -606,7 +606,7 @@
                     {
                         "name": "agent-subnet",
                         "properties": {
-                            "addressPrefix": "10.18.10.32/27",
+                            "addressPrefix": "10.18.11.32/27",
                             "routeTable": {
                                 "id": "[resourceId('Microsoft.Network/routeTables','agent-subnet-rt')]"
                             }
@@ -705,8 +705,7 @@
             "name": "[parameters('fwName')]",
             "type": "Microsoft.Compute/virtualMachines",
             "apiVersion": "2021-03-01",
-            "condition": false,
-            //"condition": "[parameters('deployFirewall')]",
+            "condition": "[parameters('deployFirewall')]",
             "tags": "[variables('tags')]",
             "location": "[parameters('location')]",
             "dependsOn": [
