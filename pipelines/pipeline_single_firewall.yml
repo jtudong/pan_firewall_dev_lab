@@ -22,12 +22,12 @@ parameters:
 
 variables:
 - group: firewall-vars-1                                # Group variables
-                                                        #   deployFirwall
-                                                        #   environment
-                                                        #   location
-                                                        #   parameterFile
-                                                        #   subnetPrefix
-                                                        #   templateFile
+                                                        #   deployFirewall = true
+                                                        #   environment = sandbox
+                                                        #   location = westus3
+                                                        #   parameterFile = firewall.parameters.jsonc
+                                                        #   subnetPrefix = fwtest1
+                                                        #   templateFile = firewall.json
                                                         # Pipeline variables
                                                         #   adminPassword
                                                         #   bootstrapAccessKey
@@ -105,11 +105,11 @@ stages:
             overrideParameters: -adminPassword $(adminPassword) -bootstrapAccessKey $(bootstrapAccessKey)
             deploymentMode: Incremental
 
-#    - job: wait
-#      pool: server
-#      dependsOn: deployTemplate
-#      steps:
-#        - task: Delay@1
-#          displayName: Wait for the Firewall deployment to complete
-#          inputs:
-#            delayForMinutes: '15'
+    - job: wait
+      pool: server
+      dependsOn: deployTemplate
+      steps:
+        - task: Delay@1
+          displayName: Wait for the Firewall deployment to complete
+          inputs:
+            delayForMinutes: '15'
